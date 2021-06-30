@@ -7,9 +7,9 @@ using namespace webots;
 
 int main(int argc, char **argv) {
   Robot *robot = new Robot();
-
+  //"left_motor", "right_motor"
   Motor *wheels[2];
-  char wheels_names[2][15] = {"left_motor", "right_motor"};
+  char wheels_names[2][15] = {"arm_servo", "box_servo"};
   for (int i = 0; i < 2; i++) {
     wheels[i] = robot->getMotor(wheels_names[i]);
     wheels[i]->setPosition(INFINITY);
@@ -18,12 +18,12 @@ int main(int argc, char **argv) {
   int avoidObstacleCounter = 0;
   while (robot->step(TIME_STEP) != -1) {
   avoidObstacleCounter++;
-    if (avoidObstacleCounter > 100) {
+    if (avoidObstacleCounter > 45) {
       break;
     } 
 
-    wheels[0]->setVelocity(3);
-    wheels[1]->setVelocity(3);
+    wheels[0]->setVelocity(0.3);
+    wheels[1]->setVelocity(0.3);
 
   }
     wheels[0]->setVelocity(0);
