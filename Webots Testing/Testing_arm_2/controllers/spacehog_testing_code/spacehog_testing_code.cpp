@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     } 
 
     wheels[0]->setVelocity(0.3);
-    wheels[1]->setVelocity(0.3);
+    //wheels[1]->setVelocity(0.3);
 
   }
     wheels[0]->setVelocity(0);
