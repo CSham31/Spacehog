@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   int avoidObstacleCounter = 0;
   while (robot->step(TIME_STEP) != -1) {
   avoidObstacleCounter++;
-    if (avoidObstacleCounter > 100) {
+    if (avoidObstacleCounter > 200) {
       break;
     } 
 
