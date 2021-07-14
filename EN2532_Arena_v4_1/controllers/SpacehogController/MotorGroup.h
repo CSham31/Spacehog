@@ -23,7 +23,7 @@ public:
 private:
     LineFollower *follower;
     Motor *wheels[4];
-    char wheels_names[4][8] = {"wheel1", "wheel2", "wheel3", "wheel4"};
+    char wheels_names[4][12] = {"motor_left", "motor_right", "arm_servo", "box_servo"};
 };
 
 #endif

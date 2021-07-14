@@ -34,6 +34,7 @@ extern "C"
 
         void update_state();
         void travel_maze();
+        void test();
 
         void passive_wait(double targetLeft, double targetRight);
 
@@ -56,7 +57,7 @@ extern "C"
 
 
     private:
-        SensorPanel *sensorPanel;
+        SensorGroup *sensorGroup;
         MotorGroup *motorGroup;
 
         State currentState = INITIALIZE;

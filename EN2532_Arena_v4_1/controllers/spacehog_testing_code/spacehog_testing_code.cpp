@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   //"left_motor", "right_motor"
   //"arm_servo", "box_servo"
   Motor *wheels[2];
-  char wheels_names[2][15] = {"left_motor", "right_motor"};
+  char wheels_names[2][15] = {"motor_left", "motor_right"};
   for (int i = 0; i < 2; i++) {
     wheels[i] = robot->getMotor(wheels_names[i]);
     wheels[i]->setPosition(INFINITY);

@@ -6,7 +6,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
-#define TIME_STEP 32
+#define TIME_STEP 8
 using namespace webots;
 using namespace std;
 
@@ -21,7 +21,7 @@ void SensorGroup::initialize(LineFollower *follower)
 
 void SensorGroup::init_distance_sensor(LineFollower *follower)
 {
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 6; i++)
     {
         ds[i] = follower->getDistanceSensor(dsNames[i]);
         ds[i]->enable(TIME_STEP);
@@ -54,7 +54,8 @@ void SensorGroup::init_camera(LineFollower *follower)
 float SensorGroup::get_distance_value(int index)
 {
     float val = ds[index]->getValue();
-    return val * REFLECTION_FACTOR;
+    return round(val * REFLECTION_FACTOR);
+    //return val;
 }
 
 double SensorGroup::get_encoder_val(int index)

@@ -38,11 +38,11 @@ public:
 
 private:
     LineFollower *follower;
-    DistanceSensor *ds[7];
-    char dsNames[7][12] = {"ir_left_0", "ir_right_0", "ir_left_1", "ir_right_1", "ds_front", "ds_right", "ds_left"};
+    DistanceSensor *ds[6];
+    char dsNames[6][12] = {"sharp_left", "sharp_right", "sharp_front", "sharp_box", "tof_left", "tof_right"};
 
-    PositionSensor *encoder[2];
-    char encoder_name[2][14] = {"encoder_left", "encoder_right"};
+    PositionSensor *encoder[4];
+    char encoder_name[4][18] = {"encoder_left", "encoder_right","arm_servo_encoder","box_servo_encoder"};
     bool enableWallFollow = false;
 
     Camera *camera;
@@ -79,8 +79,8 @@ private:
     float BLACK_WHITE_THRESHOLD = (IR_BLACK_VALUE + IR_WHITE_VALUE) / 2;
 
     
-    float += 1;
-    float ROUGHNESS = 0.2;
+    float RED_LEVEL = 0.666667;
+    float ROUGHNESS = 0.9;
     float OCCLUSION = 0;
     float REFLECTION_FACTOR = 0.2 + 0.8*RED_LEVEL*(1 - 0.5*ROUGHNESS)*(1 - 0.5*OCCLUSION);
     

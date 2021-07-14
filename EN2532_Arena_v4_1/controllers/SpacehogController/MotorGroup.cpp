@@ -40,8 +40,8 @@ void MotorGroup::set_velocity(float leftSpeed, float rightSpeed)
 {
     wheels[0]->setVelocity(leftSpeed);
     wheels[1]->setVelocity(rightSpeed);
-    wheels[2]->setVelocity(leftSpeed);
-    wheels[3]->setVelocity(rightSpeed);
+    // wheels[2]->setVelocity(leftSpeed);
+    // wheels[3]->setVelocity(rightSpeed);
 }
 
 void MotorGroup::set_position(double leftPosition, double rightPosition)

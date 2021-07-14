@@ -12,9 +12,9 @@ using namespace std;
 
 LineFollower::LineFollower()
 {
-    sensorPanel = new SensorPanel();
+    sensorGroup = new SensorGroup();
     motorGroup = new MotorGroup();
-    sensorPanel->initialize(this);
+    sensorGroup->initialize(this);
     motorGroup->initialize(this);
 }
 
@@ -30,8 +30,8 @@ void LineFollower::passive_wait(double targetLeft, double targetRight)
         if (step(TIME_STEP) == -1)
             exit(EXIT_SUCCESS);
 
-        effectiveLeft = sensorPanel->get_encoder_val(LEFT);
-        effectiveRight = sensorPanel->get_encoder_val(RIGHT);
+        effectiveLeft = sensorGroup->get_encoder_val(LEFT);
+        effectiveRight = sensorGroup->get_encoder_val(RIGHT);
         dif = min(fabs(effectiveLeft - targetLeft), fabs(effectiveRight - targetRight));
 
     } while (dif > DELTA);
@@ -44,15 +44,15 @@ void LineFollower::follow_line_striaght()
     leftSpeed = 7.5;
     rightSpeed = 7.5;
 
-    leftIRVal = sensorPanel->get_ir_value(0);
-    rightIRVal = sensorPanel->get_ir_value(1);
+    leftIRVal = sensorGroup->get_ir_value(0);
+    rightIRVal = sensorGroup->get_ir_value(1);
 
-    if (sensorPanel->get_digital_value(0) == WHITE)
+    if (sensorGroup->get_digital_value(0) == WHITE)
     {
         leftSpeed = 2.5;
         rightSpeed = 3.5;
     }
-    else if (sensorPanel->get_digital_value(1) == WHITE)
+    else if (sensorGroup->get_digital_value(1) == WHITE)
     {
         leftSpeed = 3.5;
         rightSpeed = 2.5;
@@ -65,11 +65,11 @@ void LineFollower::follow_line_initial_phase()
 {
     follow_line_striaght();
 
-    int color = sensorPanel->detect_color_patch();
+    int color = sensorGroup->detect_color_patch();
 
-    if (((colorPatch != -1 && color == 4) || sensorPanel->get_encoder_val(0) > 155) && !colorPrinted)
+    if (((colorPatch != -1 && color == 4) || sensorGroup->get_encoder_val(0) > 155) && !colorPrinted)
     {
-        sensorPanel->print_color_patch();
+        sensorGroup->print_color_patch();
         colorPrinted = true;
     }
 
@@ -82,13 +82,13 @@ void LineFollower::follow_line_initial_phase()
         }
     }
 
-    bool junctionAhead = sensorPanel->is_junction_detected();
+    bool junctionAhead = sensorGroup->is_junction_detected();
 
     if (junctionAhead)
     {
         if (!colorPrinted)
         {
-            sensorPanel->print_color_patch();
+            sensorGroup->print_color_patch();
             colorPrinted = true;
         }
         update_state();
@@ -99,8 +99,8 @@ void LineFollower::follow_line_middle_phase()
 {
     follow_line_striaght();
 
-    bool wallAhead = sensorPanel->is_wall_entrance();
-    bool junctionAhead = sensorPanel->is_junction_detected();
+    bool wallAhead = sensorGroup->is_wall_entrance();
+    bool junctionAhead = sensorGroup->is_junction_detected();
 
     if (wallAhead || junctionAhead)
     {
@@ -116,9 +116,9 @@ void LineFollower::follow_line_end_phase()
 {
     follow_line_striaght();
 
-    bool junctionAhead = sensorPanel->is_junction_detected();
+    bool junctionAhead = sensorGroup->is_junction_detected();
 
-    if (junctionAhead || sensorPanel->detect_color_patch() != colorPatch)
+    if (junctionAhead || sensorGroup->detect_color_patch() != colorPatch)
     {
         if (junctionAhead)
         {
@@ -137,14 +137,14 @@ void LineFollower::follow_line_end_phase()
 
 void LineFollower::complete_turn(int dir)
 {
-    sensorPanel->stabilize_encoder(this);
+    sensorGroup->stabilize_encoder(this);
 
     int sign = 1;
     if (dir == LEFT)
         sign = -1;
 
-    double initialLeftENcount = sensorPanel->get_encoder_val(LEFT);
-    double initialRightENcount = sensorPanel->get_encoder_val(RIGHT);
+    double initialLeftENcount = sensorGroup->get_encoder_val(LEFT);
+    double initialRightENcount = sensorGroup->get_encoder_val(RIGHT);
 
     double leftCount = initialLeftENcount + (sign * TURN90_EN_COUNT);
     double rightCount = initialRightENcount - (sign * TURN90_EN_COUNT);
@@ -168,10 +168,10 @@ void LineFollower::complete_turn(int dir)
 void LineFollower::go_forward_specific_distance(double distance)
 {
 
-    sensorPanel->stabilize_encoder(this);
+    sensorGroup->stabilize_encoder(this);
 
-    double initialLeftENcount = sensorPanel->get_encoder_val(LEFT);
-    double initialRightENcount = sensorPanel->get_encoder_val(RIGHT);
+    double initialLeftENcount = sensorGroup->get_encoder_val(LEFT);
+    double initialRightENcount = sensorGroup->get_encoder_val(RIGHT);
 
     motorGroup->set_control_pid(4.5, 0, 0);
     motorGroup->set_velocity(7.5, 7.5);
@@ -186,14 +186,14 @@ void LineFollower::go_forward_specific_distance(double distance)
 void LineFollower::navigate_wall_maze()
 {
     bool skip = false;
-    if (sensorPanel->is_wall_exit() == true)
+    if (sensorGroup->is_wall_exit() == true)
     {
         skip = true;
         update_state(); 
     }
     if (!skip)
     {
-        if ((sensorPanel->get_distance_value(DS_SENSOR_FRONT) < frontWallThreshold) == true)
+        if ((sensorGroup->get_distance_value(DS_SENSOR_FRONT) < frontWallThreshold) == true)
         {
             wallJuncCount++;
             if (wallJuncCount % 2 == 1)
@@ -207,7 +207,7 @@ void LineFollower::navigate_wall_maze()
                 frontWallThreshold = WALL_FOLLOW_VERTICAL_FRONT_THRESHOLD;
             }
 
-            if (sensorPanel->is_wall(RIGHT) == false)
+            if (sensorGroup->is_wall(RIGHT) == false)
                 complete_turn(RIGHT);
             else
                 complete_turn(LEFT);
@@ -221,13 +221,13 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 {
     double error = 0;
 
-    if (sensorPanel->is_wall(LEFT))
+    if (sensorGroup->is_wall(LEFT))
     {
-        error = threshold - round(sensorPanel->get_distance_value(DS_SENSOR_LEFT));
+        error = threshold - round(sensorGroup->get_distance_value(DS_SENSOR_LEFT));
     }
-    else if (sensorPanel->is_wall(RIGHT))
+    else if (sensorGroup->is_wall(RIGHT))
     {
-        error = round(sensorPanel->get_distance_value(DS_SENSOR_RIGHT)) - threshold;
+        error = round(sensorGroup->get_distance_value(DS_SENSOR_RIGHT)) - threshold;
     }
 
     double controlValue = (error * Kp) + (error - wallFollowPreviousError) * Kd;
@@ -258,8 +258,8 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 
 void LineFollower::find_destination()
 {
-    sensorPanel->detect_color_patches();
-    finalPosition = distance(sensorPanel->COLORS, find(sensorPanel->COLORS, sensorPanel->COLORS + 3, colorPatch));
+    sensorGroup->detect_color_patches();
+    finalPosition = distance(sensorGroup->COLORS, find(sensorGroup->COLORS, sensorGroup->COLORS + 3, colorPatch));
 
     if (finalPosition % 2 == 0)
     {
@@ -337,7 +337,7 @@ void LineFollower::update_state()
         {
             currentState = order[currentInst / 2 - 1];
             if (currentState == TURN_RIGHT)
-                sensorPanel->enable_wall_follow();
+                sensorGroup->enable_wall_follow();
         }
     }
     else
@@ -402,4 +402,8 @@ void LineFollower::travel_maze()
     }
 }
 
-
+void LineFollower::test()
+{
+    //motorGroup->set_velocity(5, 5);
+    cout<<sensorGroup->get_distance_value(4)<<endl;
+}
