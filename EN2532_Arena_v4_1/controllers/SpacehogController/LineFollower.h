@@ -86,8 +86,8 @@ extern "C"
         float rightIRVal = 0;
         float leftIRVal = 0;
 
-        float TURN90_EN_COUNT = 5.8;
-        float TURN180_EN_COUNT = 11.35;
+        float TURN90_EN_COUNT = 5.44;
+        float TURN180_EN_COUNT = 10.4;
 
 
         float WALL_FOLLOW_VERTICAL_SIDE_THRESHOLD = 63.5;

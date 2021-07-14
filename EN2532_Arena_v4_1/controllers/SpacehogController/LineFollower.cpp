@@ -411,5 +411,6 @@ void LineFollower::test()
     //motorGroup->set_velocity(5, 5);
     //cout<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
     //cout<<sensorGroup->is_wall(RIGHT)<<endl;
-    follow_both_walls(0.005,0.1,100);
+    //follow_both_walls(0.005,0.1,100);
+    complete_turn(BACK);
 }
