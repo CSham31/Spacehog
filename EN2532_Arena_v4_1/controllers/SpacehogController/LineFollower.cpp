@@ -6,7 +6,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
-#define TIME_STEP 32
+#define TIME_STEP 8
 using namespace webots;
 using namespace std;
 
@@ -224,6 +224,7 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
     if (sensorGroup->is_wall(LEFT))
     {
         error = threshold - round(sensorGroup->get_distance_value(DS_SENSOR_LEFT));
+        //cout<<"following left wall"<<endl;
     }
     else if (sensorGroup->is_wall(RIGHT))
     {
@@ -231,6 +232,8 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
     }
 
     double controlValue = (error * Kp) + (error - wallFollowPreviousError) * Kd;
+
+    cout<<controlValue<<endl;
 
     wallFollowPreviousError = error;
 
@@ -404,6 +407,9 @@ void LineFollower::travel_maze()
 
 void LineFollower::test()
 {
+    sensorGroup->enable_wall_follow();
     //motorGroup->set_velocity(5, 5);
-    cout<<sensorGroup->get_distance_value(4)<<endl;
+    //cout<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
+    //cout<<sensorGroup->is_wall(RIGHT)<<endl;
+    follow_both_walls(0.005,0.1,100);
 }

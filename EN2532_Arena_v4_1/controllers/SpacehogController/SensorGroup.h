@@ -61,8 +61,8 @@ private:
     int IR_LEFT_1 = 2;
     int IR_RIGHT_1 = 3;
     int DS_SENSOR_FRONT = 4;
-    int DS_SENSOR_RIGHT = 5;
-    int DS_SENSOR_LEFT = 6;
+    int DS_SENSOR_RIGHT = 1;
+    int DS_SENSOR_LEFT = 0;
 
     int WIDTH, HEIGHT;
     int RED = 1;
@@ -71,7 +71,7 @@ private:
     int NO_PATCH = 4;
     int recentColor = -1;
 
-    int SIDE_WALL_THRESHOLD = 90;
+    int SIDE_WALL_THRESHOLD = 150;
     int FRONT_WALL_THRESHOLD = 75;
 
     float IR_BLACK_VALUE = 10;
