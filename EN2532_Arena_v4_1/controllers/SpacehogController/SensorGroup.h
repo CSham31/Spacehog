@@ -19,6 +19,7 @@ public:
     
     float get_ir_value(int index);
     float get_distance_value(int index);
+    float get_generic_value(int index);
     double get_encoder_val(int index);
     int get_digital_value(int index);
     void stabilize_encoder(LineFollower* follower);
@@ -33,6 +34,8 @@ public:
     bool is_wall(int side);
     bool is_wall_entrance();
     bool is_wall_exit();
+
+    int is_pillar_detected(int side);
 
     int COLORS[3];
 
@@ -60,9 +63,11 @@ private:
     int IR_RIGHT_0 = 1;
     int IR_LEFT_1 = 2;
     int IR_RIGHT_1 = 3;
-    int DS_SENSOR_FRONT = 4;
+    int DS_SENSOR_FRONT = 2;
     int DS_SENSOR_RIGHT = 1;
     int DS_SENSOR_LEFT = 0;
+    int TOF_RIGHT = 5;
+    int TOF_LEFT = 4;
 
     int WIDTH, HEIGHT;
     int RED = 1;
@@ -83,6 +88,9 @@ private:
     float ROUGHNESS = 0.9;
     float OCCLUSION = 0;
     float REFLECTION_FACTOR = 0.2 + 0.8*RED_LEVEL*(1 - 0.5*ROUGHNESS)*(1 - 0.5*OCCLUSION);
+
+    int FAR_RANGE = 140;
+    int NEAR_RANGE = 70;
     
 };
 

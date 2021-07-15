@@ -58,6 +58,13 @@ float SensorGroup::get_distance_value(int index)
     //return val;
 }
 
+float SensorGroup::get_generic_value(int index)
+{
+    //float val = ds[index]->getValue();
+    return round(ds[index]->getValue());
+    //return val;
+}
+
 double SensorGroup::get_encoder_val(int index)
 {
     double val = encoder[index]->getValue();
@@ -110,6 +117,24 @@ bool SensorGroup::is_wall_exit()
         return true;
     else
         return false;
+}
+
+int SensorGroup::is_pillar_detected(int side)
+{
+    float distance;
+
+    if (side == LEFT)
+        distance = get_generic_value(TOF_LEFT); 
+    else 
+        distance = get_generic_value(TOF_RIGHT); 
+    
+
+    if (distance < NEAR_RANGE ) 
+        return 1;
+    else if ( distance < FAR_RANGE) 
+        return 2;
+    else
+        return 0;
 }
 
 void SensorGroup::stabilize_encoder(LineFollower *follower)

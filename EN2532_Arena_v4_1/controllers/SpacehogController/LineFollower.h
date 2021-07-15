@@ -55,7 +55,6 @@ extern "C"
 
 
 
-
     private:
         SensorGroup *sensorGroup;
         MotorGroup *motorGroup;
@@ -82,6 +81,8 @@ extern "C"
         int DS_SENSOR_FRONT = 4;
         int DS_SENSOR_RIGHT = 1;
         int DS_SENSOR_LEFT = 0;
+        int TOF_RIGHT = 5;
+        int TOF_LEFT = 4;
 
         float rightIRVal = 0;
         float leftIRVal = 0;
@@ -114,3 +115,4 @@ extern "C"
 #endif
 
 #endif
+

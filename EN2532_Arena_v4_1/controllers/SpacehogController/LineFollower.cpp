@@ -255,6 +255,9 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 ////////////////////////////////////////////////////////// final stage methods /////////////////////////////////////////////////////////////////////////
@@ -407,10 +410,11 @@ void LineFollower::travel_maze()
 
 void LineFollower::test()
 {
-    sensorGroup->enable_wall_follow();
-    //motorGroup->set_velocity(5, 5);
-    //cout<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
+    //sensorGroup->enable_wall_follow();
+    motorGroup->set_velocity(7.0, 7.0);
+    //cout<<sensorGroup->get_distance_value(TOF_RIGHT)<<endl;
     //cout<<sensorGroup->is_wall(RIGHT)<<endl;
+    cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
     //follow_both_walls(0.005,0.1,100);
-    complete_turn(BACK);
+    //complete_turn(BACK);
 }
