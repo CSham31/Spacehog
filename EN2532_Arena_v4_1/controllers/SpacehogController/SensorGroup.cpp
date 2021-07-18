@@ -30,7 +30,7 @@ void SensorGroup::init_distance_sensor(LineFollower *follower)
 
 void SensorGroup::init_encoders(LineFollower *follower)
 {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
     {
         encoder[i] = follower->getPositionSensor(encoder_name[i]);
         encoder[i]->enable(TIME_STEP);

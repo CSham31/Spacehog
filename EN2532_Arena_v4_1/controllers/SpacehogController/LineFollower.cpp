@@ -37,6 +37,22 @@ void LineFollower::passive_wait(double targetLeft, double targetRight)
     } while (dif > DELTA);
 }
 
+void LineFollower::passive_wait_servo(int servo, double target)
+{
+    const double DELTA = 0.01;
+    double dif;
+    double effective;
+    do
+    {
+        if (step(TIME_STEP) == -1)
+            exit(EXIT_SUCCESS);
+
+        effective = sensorGroup->get_encoder_val(servo);
+        dif = fabs(effective - target);             //check here again
+        //cout<<target<<endl;
+    } while (dif > DELTA);
+}
+
 ////////////////////////////////////////////////////////// follow line methods /////////////////////////////////////////////////////////////////////////
 
 void LineFollower::follow_line_striaght()
@@ -257,6 +273,24 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void LineFollower::set_servo(int state)
+{
+    if (state <3)       //arm servo
+    {
+        motorGroup->set_control_pid(4.5, 0, 0);
+        motorGroup->set_velocity_servo(ARM, 0.5);
+        motorGroup->set_position_servo(ARM, servoPosition[state]);
+        passive_wait_servo(ARM, servoPosition[state]);
+    }
+    else
+    {
+        motorGroup->set_control_pid(4.5, 0, 0);
+        motorGroup->set_velocity_servo(BOX, 0.5);
+        motorGroup->set_position_servo(BOX, servoPosition[state]);
+        passive_wait_servo(BOX, servoPosition[state]);
+    }
+}
+
 
 
 
@@ -411,10 +445,13 @@ void LineFollower::travel_maze()
 void LineFollower::test()
 {
     //sensorGroup->enable_wall_follow();
-    motorGroup->set_velocity(7.0, 7.0);
+    //motorGroup->set_velocity(7.0, 7.0);
     //cout<<sensorGroup->get_distance_value(TOF_RIGHT)<<endl;
     //cout<<sensorGroup->is_wall(RIGHT)<<endl;
-    cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
+    //cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
     //follow_both_walls(0.005,0.1,100);
-    //complete_turn(BACK);
+    //complete_turn(RIGHT);
+    set_servo(POS_ARM_DOWN);
+    set_servo(POS_BOX_DOWN);
+    set_servo(POS_ARM_UP);
 }

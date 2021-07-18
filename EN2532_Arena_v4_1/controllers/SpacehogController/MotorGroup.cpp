@@ -48,8 +48,19 @@ void MotorGroup::set_position(double leftPosition, double rightPosition)
 {
     wheels[0]->setPosition(leftPosition); //left
     wheels[1]->setPosition(rightPosition);
-    wheels[2]->setPosition(leftPosition); //left
-    wheels[3]->setPosition(rightPosition);
+    // wheels[2]->setPosition(leftPosition); //left
+    // wheels[3]->setPosition(rightPosition);
+}
+
+void MotorGroup::set_velocity_servo(int servo, float speed)
+{
+    wheels[servo]->setVelocity(speed);
+}
+
+void MotorGroup::set_position_servo(int servo, double position)
+{
+    wheels[servo]->setPosition(position);
+
 }
 
 void MotorGroup::set_control_pid(float val1, float val2,float val3){

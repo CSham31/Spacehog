@@ -37,6 +37,7 @@ extern "C"
         void test();
 
         void passive_wait(double targetLeft, double targetRight);
+        void passive_wait_servo(int servo, double target);
 
         void follow_line_striaght();
         void follow_line_initial_phase();
@@ -49,6 +50,8 @@ extern "C"
 
         void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);
+
+        void set_servo(int state);
 
         void find_destination();
         void find_factors(int n);
@@ -70,6 +73,8 @@ extern "C"
         int RIGHT = 1;
         int BACK = 2;
         int FRONT = 4;
+        int ARM = 2;    //index of arm servo
+        int BOX = 3;    //index of box servo
 
         float leftSpeed;
         float rightSpeed;
@@ -109,6 +114,16 @@ extern "C"
         bool factorsFound = false;
         bool colorPrinted = false;
         int finalPhase = 50;
+
+        int POS_ARM_UP = 0;
+        int POS_ARM_DOWN = 1;
+        int POS_ARM_DEFAULT = 2;
+        int POS_BOX_UP = 3;
+        int POS_BOX_DOWN = 4;
+        int POS_BOX_DEFAULT = 5;
+        float servoPosition[6] = {0.8,-0.59,0.0,1.6,-0.1,0.0};
+
+
     };
 #ifdef __cplusplus
 }

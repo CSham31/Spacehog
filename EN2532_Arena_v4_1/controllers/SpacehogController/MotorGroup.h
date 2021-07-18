@@ -20,6 +20,9 @@ public:
     void set_position(double leftPosition, double rightPosition);
     void set_control_pid(float val1, float val2,float val3);
 
+    void set_velocity_servo(int servo, float speed);
+    void set_position_servo(int servo, double position);
+
 private:
     LineFollower *follower;
     Motor *wheels[4];
