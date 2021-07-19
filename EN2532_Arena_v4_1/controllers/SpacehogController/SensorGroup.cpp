@@ -14,6 +14,7 @@ void SensorGroup::initialize(LineFollower *follower)
 {
     follower = follower;
     init_distance_sensor(follower);
+    init_qtr_sensor(follower);
     init_encoders(follower);
     init_camera(follower);
     stabilize_ir_and_distance_sensors(follower);
@@ -28,6 +29,15 @@ void SensorGroup::init_distance_sensor(LineFollower *follower)
     }
 }
 
+void SensorGroup::init_qtr_sensor(LineFollower *follower)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        qtr[i] = follower->getDistanceSensor(qtrNames[i]);
+        qtr[i]->enable(TIME_STEP);
+    }
+}
+
 void SensorGroup::init_encoders(LineFollower *follower)
 {
     for (int i = 0; i < 4; i++)
@@ -39,7 +49,7 @@ void SensorGroup::init_encoders(LineFollower *follower)
 
 float SensorGroup::get_ir_value(int index)
 {
-    float val = ds[index]->getValue();
+    float val = qtr[index]->getValue();
     return val;
 }
 
@@ -81,10 +91,41 @@ int SensorGroup::get_digital_value(int index)
 
 bool SensorGroup::is_junction_detected()
 {
-    if ((get_digital_value(IR_LEFT_1) == WHITE) or (get_digital_value(IR_RIGHT_1) == WHITE))
+    if ((get_digital_value(LINE_DETECT_LEFT) == WHITE) or (get_digital_value(LINE_DETECT_RIGHT) == WHITE))
         return true;
     else
         return false;
+}
+
+int SensorGroup::qtr_read_line()
+{
+    int irValues[8];
+    int numerator = 0;
+    int denominator = 0;
+
+    for (int i=0; i<8 ; i++){
+        irValues[i] = get_digital_value(i);
+    }
+    for (int i=0; i<8 ; i++){
+        numerator += i*1000*irValues[i];
+        denominator += irValues[i];
+    }
+    //cout<<irValues[7]<<"  "<<irValues[6]<<"  "<<irValues[1]<<"  "<<irValues[0]<<endl;
+    if ((numerator == 0) and (denominator == 0))    // to prevent 0/0 division form happening
+    {
+        //cout<<previousQTR_7<<"  "<<previousQTR_0<<endl;
+        if (previousQTR_7 == 1)
+            return 7000;
+        else if (previousQTR_0 == 1)
+            return 0;
+        else
+            cout<<"undefined value at qtr read line"<<endl;
+    }
+
+    previousQTR_7 = irValues[QTR_7];
+    previousQTR_0 = irValues[QTR_0];
+
+    return (numerator/denominator);
 }
 
 void SensorGroup::enable_wall_follow()
@@ -153,7 +194,7 @@ void SensorGroup::stabilize_ir_and_distance_sensors(LineFollower *follower)
 {
     while (follower->step(TIME_STEP) != -1)
     {
-        if (!(isnan(get_ir_value(IR_LEFT_0)) && isnan(get_ir_value(IR_RIGHT_0)) && isnan(get_ir_value(IR_LEFT_1)) && isnan(get_ir_value(IR_RIGHT_1)) 
+        if (!(isnan(get_ir_value(QTR_0)) && isnan(get_ir_value(QTR_1)) && isnan(get_ir_value(QTR_2)) && isnan(get_ir_value(QTR_3)) 
         && isnan(get_ir_value(DS_SENSOR_FRONT)) && isnan(get_ir_value(DS_SENSOR_LEFT)) && isnan(get_ir_value(DS_SENSOR_RIGHT))))
             break; //to make sure that ir and distance sensors dosent return NaN
     }

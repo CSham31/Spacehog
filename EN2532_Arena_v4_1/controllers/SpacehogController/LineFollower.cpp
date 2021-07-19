@@ -55,6 +55,39 @@ void LineFollower::passive_wait_servo(int servo, double target)
 
 ////////////////////////////////////////////////////////// follow line methods /////////////////////////////////////////////////////////////////////////
 
+void LineFollower::follow_line(float Kp, float Kd)
+{
+    // leftSpeed = 7.5;
+    // rightSpeed = 7.5;
+
+    int position = sensorGroup->qtr_read_line();
+    int error = position - 3500;
+
+    double controlValue = (error * Kp) + (error - wallFollowPreviousError) * Kd;
+
+    //cout<<controlValue<<endl;
+
+    lineFollowPreviousError = error;
+
+    // leftSpeed = MAX_VELOCITY;
+    // rightSpeed = MAX_VELOCITY;
+
+    rightSpeed = WALL_FOLLOW_BASE_SPEED - controlValue;
+    leftSpeed = WALL_FOLLOW_BASE_SPEED + controlValue;
+
+    if (rightSpeed < MIN_VELOCITY)
+        rightSpeed = MIN_VELOCITY;
+    else if (rightSpeed > MAX_VELOCITY)
+        rightSpeed = MAX_VELOCITY;
+
+    if (leftSpeed < MIN_VELOCITY)
+        leftSpeed = MIN_VELOCITY;
+    else if (leftSpeed > MAX_VELOCITY)
+        leftSpeed = MAX_VELOCITY;
+
+    motorGroup->set_velocity(leftSpeed, rightSpeed);
+}
+
 void LineFollower::follow_line_striaght()
 {
     leftSpeed = 7.5;
@@ -451,7 +484,11 @@ void LineFollower::test()
     //cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
     //follow_both_walls(0.005,0.1,100);
     //complete_turn(RIGHT);
-    set_servo(POS_ARM_DOWN);
-    set_servo(POS_BOX_DOWN);
-    set_servo(POS_ARM_UP);
+
+    // set_servo(POS_ARM_DOWN);
+    // set_servo(POS_BOX_DOWN);
+    // set_servo(POS_ARM_UP);
+
+    follow_line(0.05,0.0);
+    //cout<<sensorGroup->qtr_read_line()<<endl;
 }

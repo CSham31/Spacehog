@@ -13,6 +13,7 @@ class SensorGroup
 public:
     void initialize(LineFollower* follower);
     void init_distance_sensor(LineFollower* follower);
+    void init_qtr_sensor(LineFollower *follower);
     void init_encoders(LineFollower* follower);
     void init_camera(LineFollower *follower);
 
@@ -37,12 +38,17 @@ public:
 
     int is_pillar_detected(int side);
 
+    int qtr_read_line();
+
     int COLORS[3];
 
 private:
     LineFollower *follower;
     DistanceSensor *ds[6];
     char dsNames[6][12] = {"sharp_left", "sharp_right", "sharp_front", "sharp_box", "tof_left", "tof_right"};
+
+    DistanceSensor *qtr[10];
+    char qtrNames[10][18] = {"qtr_0", "qtr_1", "qtr_2", "qtr_3", "qtr_4", "qtr_5","qtr_6","qtr_7","line_detect_left","line_detect_right"};
 
     PositionSensor *encoder[4];
     char encoder_name[4][18] = {"encoder_left", "encoder_right","arm_servo_encoder","box_servo_encoder"};
@@ -59,10 +65,20 @@ private:
     int BACK = 2;
     int FRONT = 4;
 
-    int IR_LEFT_0 = 0;
-    int IR_RIGHT_0 = 1;
-    int IR_LEFT_1 = 2;
-    int IR_RIGHT_1 = 3;
+    int QTR_0 = 0;
+    int QTR_1 = 1;
+    int QTR_2 = 2;
+    int QTR_3 = 3;
+    int QTR_4 = 4;
+    int QTR_5 = 5;
+    int QTR_6 = 6;
+    int QTR_7 = 7;
+    int LINE_DETECT_LEFT = 8;
+    int LINE_DETECT_RIGHT = 9;
+
+    int previousQTR_7 = 0;
+    int previousQTR_0 = 0;
+
     int DS_SENSOR_FRONT = 2;
     int DS_SENSOR_RIGHT = 1;
     int DS_SENSOR_LEFT = 0;

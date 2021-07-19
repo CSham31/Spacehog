@@ -39,6 +39,7 @@ extern "C"
         void passive_wait(double targetLeft, double targetRight);
         void passive_wait_servo(int servo, double target);
 
+        void follow_line(float Kp, float Kd);
         void follow_line_striaght();
         void follow_line_initial_phase();
         void follow_line_end_phase();
@@ -107,6 +108,7 @@ extern "C"
         float frontWallThreshold = WALL_FOLLOW_VERTICAL_FRONT_THRESHOLD;
 
         float wallFollowPreviousError = 0.0;
+        float lineFollowPreviousError = 0.0;
 
         int colorPatch = -1;
         int detectedSquares = 1;
