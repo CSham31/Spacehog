@@ -88,6 +88,26 @@ void LineFollower::follow_line(float Kp, float Kd)
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
 
+void LineFollower::follow_line_until_junc_detect()
+{
+    while (step(8) != -1)
+    {
+        if(sensorGroup->is_junction_detected() == true)
+            break;
+        follow_line(0.05,0.0);
+    }
+}
+
+void LineFollower::follow_line_until_wall_detect()
+{
+    while (step(8) != -1)
+    {
+        if(sensorGroup->is_wall_entrance() == true)
+            break;
+        follow_line(0.05,0.0);
+    }
+}
+
 void LineFollower::follow_line_striaght()
 {
     leftSpeed = 7.5;
@@ -186,6 +206,8 @@ void LineFollower::follow_line_end_phase()
 
 void LineFollower::complete_turn(int dir)
 {
+    go_forward_specific_distance(5.9);
+
     sensorGroup->stabilize_encoder(this);
 
     int sign = 1;
@@ -304,6 +326,18 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
+
+void LineFollower::follow_wall_until_line_detect()
+{
+    while (step(8) != -1)
+    {
+        if (sensorGroup->is_wall_exit() == true)               //( sensorGroup->qtr_read_line() > 0 ||  sensorGroup->qtr_read_line() < 7000)
+            break;
+        follow_both_walls(0.005,0.1,100);
+    }
+    
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LineFollower::set_servo(int state)
@@ -475,6 +509,23 @@ void LineFollower::travel_maze()
     }
 }
 
+void LineFollower::task()
+{
+    go_forward_specific_distance(2.5);
+    follow_line_until_junc_detect();
+    complete_turn(LEFT);
+    follow_line_until_wall_detect(); 
+    cout<<"here"<<endl;
+    follow_wall_until_line_detect();
+    follow_line_until_junc_detect();
+    complete_turn(RIGHT);
+    follow_line_until_junc_detect();
+    complete_turn(RIGHT);
+    //complete_turn(RIGHT);
+    //follow_line(0.05,0.0);
+
+}
+
 void LineFollower::test()
 {
     //sensorGroup->enable_wall_follow();
@@ -489,6 +540,7 @@ void LineFollower::test()
     // set_servo(POS_BOX_DOWN);
     // set_servo(POS_ARM_UP);
 
-    follow_line(0.05,0.0);
+    //follow_line(0.05,0.0);
+
     //cout<<sensorGroup->qtr_read_line()<<endl;
 }

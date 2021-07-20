@@ -9,8 +9,8 @@ int main(int argc, char **argv)
 
     while (follower.step(8) != -1)
     {
-        follower.test();
-        //break;
+        follower.task();
+        break;
 
     };
 

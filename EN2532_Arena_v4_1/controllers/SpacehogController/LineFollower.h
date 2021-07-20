@@ -34,12 +34,15 @@ extern "C"
 
         void update_state();
         void travel_maze();
+        void task();
         void test();
 
         void passive_wait(double targetLeft, double targetRight);
         void passive_wait_servo(int servo, double target);
 
         void follow_line(float Kp, float Kd);
+        void follow_line_until_junc_detect();
+        void follow_line_until_wall_detect();
         void follow_line_striaght();
         void follow_line_initial_phase();
         void follow_line_end_phase();
@@ -51,6 +54,7 @@ extern "C"
 
         void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);
+        void follow_wall_until_line_detect();
 
         void set_servo(int state);
 

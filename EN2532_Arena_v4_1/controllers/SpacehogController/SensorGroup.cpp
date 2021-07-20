@@ -135,18 +135,18 @@ void SensorGroup::enable_wall_follow()
 bool SensorGroup::is_wall(int side)
 {
     if ((side == RIGHT) and (get_distance_value(DS_SENSOR_RIGHT) < SIDE_WALL_THRESHOLD))
-        return true && enableWallFollow;
+        return true;// && enableWallFollow;
     else if ((side == LEFT) and (get_distance_value(DS_SENSOR_LEFT) < SIDE_WALL_THRESHOLD))
-        return true && enableWallFollow;
+        return true;// && enableWallFollow;
     else if ((side == FRONT) and (get_distance_value(DS_SENSOR_FRONT) < FRONT_WALL_THRESHOLD))
-        return true && enableWallFollow;
+        return true;// && enableWallFollow;
     else
-        return false && enableWallFollow;
+        return false; //&& enableWallFollow;
 }
 
 bool SensorGroup::is_wall_entrance()
 {
-    if (is_wall(LEFT) == true or is_wall(RIGHT) == true)
+    if (is_wall(LEFT) == true || is_wall(RIGHT) == true)
         return true;
     else
         return false;
@@ -154,7 +154,7 @@ bool SensorGroup::is_wall_entrance()
 
 bool SensorGroup::is_wall_exit()
 {
-    if (is_wall(LEFT) == false and is_wall(RIGHT) == false)
+    if (is_wall(LEFT) == false && is_wall(RIGHT) == false)
         return true;
     else
         return false;
