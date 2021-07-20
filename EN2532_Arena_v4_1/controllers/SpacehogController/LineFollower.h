@@ -36,21 +36,27 @@ extern "C"
         void travel_maze();
         void task();
         void test();
+        void circular_path_task();
+        void grab_box_detect_color();
+        void circular_path_middle_task();
 
         void passive_wait(double targetLeft, double targetRight);
         void passive_wait_servo(int servo, double target);
+        void passive_wait_curve_path(double targetLeft, double targetRight);
 
         void follow_line(float Kp, float Kd);
         void follow_line_until_junc_detect();
         void follow_line_until_wall_detect();
+        void follow_line_until_box_detect();
         void follow_line_striaght();
         void follow_line_initial_phase();
         void follow_line_end_phase();
         void follow_line_middle_phase();
         
         
-        void complete_turn(int dir);
+        void complete_turn(int dir, bool goForward = true);
         void go_forward_specific_distance(double distance);
+        void go_forward_specific_distance_curve(double distance);
 
         void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);
@@ -88,7 +94,7 @@ extern "C"
         float MAX_VELOCITY = 7.5;
         float MIN_VELOCITY = 2.5;
          
-        int DS_SENSOR_FRONT = 4;
+        int DS_SENSOR_FRONT = 2;
         int DS_SENSOR_RIGHT = 1;
         int DS_SENSOR_LEFT = 0;
         int TOF_RIGHT = 5;
@@ -128,6 +134,10 @@ extern "C"
         int POS_BOX_DOWN = 4;
         int POS_BOX_DEFAULT = 5;
         float servoPosition[6] = {0.8,-0.59,0.0,1.6,-0.1,0.0};
+
+        bool farBoxDetected = false;
+        bool nearBoxDetected = false;
+        bool box_detected = false;
 
 
     };

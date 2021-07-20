@@ -53,6 +53,35 @@ void LineFollower::passive_wait_servo(int servo, double target)
     } while (dif > DELTA);
 }
 
+void LineFollower::passive_wait_curve_path(double targetLeft, double targetRight)
+{
+    const double DELTA = 0.1;
+    double dif;
+    double effectiveLeft, effectiveRight;
+    do
+    {
+        if (step(TIME_STEP) == -1)
+            exit(EXIT_SUCCESS);
+
+        if ((sensorGroup->is_pillar_detected(LEFT) == 1) && (box_detected == false)) //secondition is to ensure that same box dont get detected multiple times
+        {
+            nearBoxDetected = true;
+            box_detected = true;
+        }
+        else if ((sensorGroup->is_pillar_detected(LEFT) == 2) && (box_detected == false))
+        {
+            farBoxDetected = true;
+            box_detected = true;
+        }
+
+
+        effectiveLeft = sensorGroup->get_encoder_val(LEFT);
+        effectiveRight = sensorGroup->get_encoder_val(RIGHT);
+        dif = min(fabs(effectiveLeft - targetLeft), fabs(effectiveRight - targetRight));
+
+    } while (dif > DELTA);
+}
+
 ////////////////////////////////////////////////////////// follow line methods /////////////////////////////////////////////////////////////////////////
 
 void LineFollower::follow_line(float Kp, float Kd)
@@ -106,6 +135,17 @@ void LineFollower::follow_line_until_wall_detect()
             break;
         follow_line(0.05,0.0);
     }
+}
+
+void LineFollower::follow_line_until_box_detect()
+{
+    while (step(8) != -1)
+    {
+        if(sensorGroup->get_distance_value(DS_SENSOR_FRONT) < 60 )
+            break;
+        follow_line(0.05,0.0);
+    }
+    motorGroup->set_velocity(0, 0);
 }
 
 void LineFollower::follow_line_striaght()
@@ -204,9 +244,13 @@ void LineFollower::follow_line_end_phase()
 
 ////////////////////////////////////////////////////////// turns /////////////////////////////////////////////////////////////
 
-void LineFollower::complete_turn(int dir)
+void LineFollower::complete_turn(int dir, bool goForward)
 {
-    go_forward_specific_distance(5.9);
+    if (goForward == true)
+    {
+        go_forward_specific_distance(5.9);
+        cout<<"forward"<<endl;
+    }
 
     sensorGroup->stabilize_encoder(this);
 
@@ -249,6 +293,22 @@ void LineFollower::go_forward_specific_distance(double distance)
 
     motorGroup->set_position(distance + initialLeftENcount, distance + initialRightENcount);
     passive_wait(distance + initialLeftENcount, distance + initialRightENcount);
+    motorGroup->enable_motor_velocity_control();
+}
+
+void LineFollower::go_forward_specific_distance_curve(double distance)
+{
+
+    sensorGroup->stabilize_encoder(this);
+
+    double initialLeftENcount = sensorGroup->get_encoder_val(LEFT);
+    double initialRightENcount = sensorGroup->get_encoder_val(RIGHT);
+
+    motorGroup->set_control_pid(4.5, 0, 0);
+    motorGroup->set_velocity(7.5, 7.5);
+
+    motorGroup->set_position(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
+    passive_wait_curve_path(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
     motorGroup->enable_motor_velocity_control();
 }
 
@@ -304,7 +364,7 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 
     double controlValue = (error * Kp) + (error - wallFollowPreviousError) * Kd;
 
-    cout<<controlValue<<endl;
+    //cout<<controlValue<<endl;
 
     wallFollowPreviousError = error;
 
@@ -509,6 +569,64 @@ void LineFollower::travel_maze()
     }
 }
 
+void LineFollower::grab_box_detect_color()
+{
+    set_servo(POS_ARM_DOWN);
+    set_servo(POS_BOX_DOWN);
+    set_servo(POS_ARM_UP);
+    //color detection code
+}
+
+void LineFollower::circular_path_middle_task()
+{
+    complete_turn(LEFT,false);  // false to stop robot going specific distance forward
+
+    if (nearBoxDetected == true)
+    {
+        follow_line_until_box_detect();
+        grab_box_detect_color();
+    }
+
+    follow_line_until_junc_detect();
+    go_forward_specific_distance(3.0); //to pass the middle cross
+    
+    if (farBoxDetected == true)
+    {
+        follow_line_until_box_detect();
+        grab_box_detect_color();
+    }
+
+    follow_line_until_junc_detect();
+    go_forward_specific_distance(5.9);
+    set_servo(POS_BOX_UP);          //release the box
+}
+
+void LineFollower::circular_path_task()
+{
+    complete_turn(RIGHT);
+    cout<<"after turn"<<endl;
+    follow_line_until_junc_detect();
+    go_forward_specific_distance_curve(7.5);
+    if (box_detected == true)
+    {
+        circular_path_middle_task();
+        complete_turn(LEFT,false);
+        follow_line_until_junc_detect();
+        //go_forward_specific_distance_curve(7.5);        //change this to left
+        complete_turn(RIGHT);
+    }
+    else                         //this case we assume that box is in the second cross line for sure
+    {
+        follow_line_until_junc_detect();
+        go_forward_specific_distance_curve(7.5);
+        circular_path_middle_task();
+        complete_turn(RIGHT,false);
+        follow_line_until_junc_detect();
+        //go_forward_specific_distance_curve(7.5);        //change this to left
+        complete_turn(LEFT);
+    }
+}
+
 void LineFollower::task()
 {
     go_forward_specific_distance(2.5);
@@ -521,8 +639,24 @@ void LineFollower::task()
     complete_turn(RIGHT);
     follow_line_until_junc_detect();
     complete_turn(RIGHT);
-    //complete_turn(RIGHT);
-    //follow_line(0.05,0.0);
+    follow_line_until_junc_detect();
+    //cout<<"here"<<endl;
+    circular_path_task();
+
+
+    // complete_turn(RIGHT);
+
+    // follow_line_until_junc_detect();
+    // complete_turn(RIGHT);
+    // follow_line_until_junc_detect();
+    // go_forward_specific_distance_curve(7.5);
+
+    // follow_line_until_junc_detect();
+    // circular_path_task();
+
+    //go_forward_specific_distance_curve(7.5);
+
+    //go_forward_specific_distance(6.0);
 
 }
 
@@ -530,7 +664,7 @@ void LineFollower::test()
 {
     //sensorGroup->enable_wall_follow();
     //motorGroup->set_velocity(7.0, 7.0);
-    //cout<<sensorGroup->get_distance_value(TOF_RIGHT)<<endl;
+    cout<<sensorGroup->get_distance_value(DS_SENSOR_FRONT)<<endl;
     //cout<<sensorGroup->is_wall(RIGHT)<<endl;
     //cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
     //follow_both_walls(0.005,0.1,100);
