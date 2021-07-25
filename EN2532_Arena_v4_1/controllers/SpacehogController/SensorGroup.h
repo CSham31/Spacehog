@@ -26,9 +26,9 @@ public:
     void stabilize_encoder(LineFollower* follower);
     void stabilize_ir_and_distance_sensors(LineFollower *follower);
     
-    int detect_color_patch();
+    int get_colour(int cam);
     void detect_color_patches();
-    void print_color_patch();
+    void print_color_patch(int color);
 
     bool is_junction_detected();
     void enable_wall_follow();
@@ -54,8 +54,8 @@ private:
     char encoder_name[4][18] = {"encoder_left", "encoder_right","arm_servo_encoder","box_servo_encoder"};
     bool enableWallFollow = false;
 
-    Camera *camera;
-    char camera_name[8] = {"camera"};
+    Camera *camera[3];
+    char camera_name[3][14] = {"camera","camera_back","camera_front"};
 
     int BLACK = 0;
     int WHITE = 1;
@@ -85,11 +85,16 @@ private:
     int TOF_RIGHT = 5;
     int TOF_LEFT = 4;
 
+    int CAM_ARM = 0;
+    int CAM_BACK = 1;
+    int CAM_FRONT = 2;
+    int CAM_PIXEL_THRESH = 20;
+
     int WIDTH, HEIGHT;
     int RED = 1;
     int GREEN = 2;
     int BLUE = 3;
-    int NO_PATCH = 4;
+    int NO_COLOR = 4;
     int recentColor = -1;
 
     int SIDE_WALL_THRESHOLD = 150;

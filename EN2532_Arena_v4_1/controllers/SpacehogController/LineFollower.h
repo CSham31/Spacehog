@@ -100,6 +100,10 @@ extern "C"
         int TOF_RIGHT = 5;
         int TOF_LEFT = 4;
 
+        int CAM_ARM = 0;
+        int CAM_BACK = 1;
+        int CAM_FRONT = 2;
+
         float rightIRVal = 0;
         float leftIRVal = 0;
 
@@ -126,6 +130,7 @@ extern "C"
         bool factorsFound = false;
         bool colorPrinted = false;
         int finalPhase = 50;
+        bool firstSegment = true;   //indicates weather box is in first or second line
 
         int POS_ARM_UP = 0;
         int POS_ARM_DOWN = 1;
@@ -138,6 +143,9 @@ extern "C"
         bool farBoxDetected = false;
         bool nearBoxDetected = false;
         bool box_detected = false;
+
+        int frontFaceColour = 4;
+        int bottomFaceColour = 4;
 
 
     };

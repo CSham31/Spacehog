@@ -55,10 +55,12 @@ float SensorGroup::get_ir_value(int index)
 
 void SensorGroup::init_camera(LineFollower *follower)
 {
-    camera = follower->getCamera(camera_name);
-    camera->enable(TIME_STEP);
-    WIDTH = camera->getWidth();
-    HEIGHT = camera->getHeight();
+    for (int i = 0; i < 3; i++)
+    {
+    camera[i] = follower->getCamera(camera_name[i]);
+    camera[i]->enable(TIME_STEP);
+
+    }
 }
 
 float SensorGroup::get_distance_value(int index)
@@ -202,9 +204,12 @@ void SensorGroup::stabilize_ir_and_distance_sensors(LineFollower *follower)
     }
 }
 
-int SensorGroup::detect_color_patch()
+int SensorGroup::get_colour(int cam)
 {
-    const unsigned char *IMAGE = camera->getImage();
+    const unsigned char *IMAGE = camera[cam]->getImage();
+
+    WIDTH = camera[cam]->getWidth();
+    HEIGHT = camera[cam]->getHeight();
 
     int redpix = 0;
     int greenpix = 0;
@@ -212,38 +217,40 @@ int SensorGroup::detect_color_patch()
 
     int i, j;
 
-    for (j = HEIGHT - 1; j >= 0; j--)
+    for (j = CAM_PIXEL_THRESH ; j < (HEIGHT-CAM_PIXEL_THRESH); j++)
     {
-        for (i = WIDTH / 4; i < 3 * WIDTH / 4; i++)
+        for (i = CAM_PIXEL_THRESH; i < (WIDTH-CAM_PIXEL_THRESH); i++)
         {
 
-            redpix = camera->imageGetRed(IMAGE, WIDTH, i, j);
-            bluepix = camera->imageGetBlue(IMAGE, WIDTH, i, j);
-            greenpix = camera->imageGetGreen(IMAGE, WIDTH, i, j);
+            redpix += camera[cam]->imageGetRed(IMAGE, WIDTH, i, j);
+            bluepix += camera[cam]->imageGetBlue(IMAGE, WIDTH, i, j);
+            greenpix += camera[cam]->imageGetGreen(IMAGE, WIDTH, i, j);
 
-            if ((redpix > 4 * greenpix) && (redpix > 4 * bluepix))
+            if ((redpix > greenpix) && (redpix >  bluepix))
             {
                 recentColor = RED;
                 return RED;
             }
-            else if ((greenpix > 4 * redpix) && (greenpix > 4 * bluepix))
+            else if ((greenpix >  redpix) && (greenpix >  bluepix))
             {
                 recentColor = GREEN;
                 return GREEN;
             }
-            else if ((bluepix > 4 * redpix) && (bluepix > 4 * greenpix))
+            else if ((bluepix >  redpix) && (bluepix >  greenpix))
             {
                 recentColor = BLUE;
                 return BLUE;
             }
         }
     }
-    return NO_PATCH;
+    return NO_COLOR;
 }
 
 void SensorGroup::detect_color_patches()
 {
-    const unsigned char *IMAGE = camera->getImage();
+    const unsigned char *IMAGE = camera[0]->getImage();
+
+
 
     int redpix = 0;
     int greenpix = 0;
@@ -259,9 +266,9 @@ void SensorGroup::detect_color_patches()
     {
         for (j = 0; j < HEIGHT; j++)
         {
-            redpix = camera->imageGetRed(IMAGE, WIDTH, i, j);
-            bluepix = camera->imageGetBlue(IMAGE, WIDTH, i, j);
-            greenpix = camera->imageGetGreen(IMAGE, WIDTH, i, j);
+            redpix = camera[0]->imageGetRed(IMAGE, WIDTH, i, j);
+            bluepix = camera[0]->imageGetBlue(IMAGE, WIDTH, i, j);
+            greenpix = camera[0]->imageGetGreen(IMAGE, WIDTH, i, j);
 
             if (!red_detected && (redpix > 4 * greenpix) && (redpix > 4 * bluepix))
             {
@@ -286,17 +293,17 @@ void SensorGroup::detect_color_patches()
     return;
 }
 
-void SensorGroup::print_color_patch()
+void SensorGroup::print_color_patch(int color)
 {
-    if (recentColor == RED)
+    if (color == RED)
     {
         cout << "RED" << endl;
     }
-    else if (recentColor == GREEN)
+    else if (color == GREEN)
     {
         cout << "GREEN" << endl;
     }
-    else if(recentColor == BLUE)
+    else if(color == BLUE)
     {
         cout << "BLUE" << endl;
     }

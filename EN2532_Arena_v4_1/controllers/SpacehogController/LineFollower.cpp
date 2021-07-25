@@ -141,7 +141,7 @@ void LineFollower::follow_line_until_box_detect()
 {
     while (step(8) != -1)
     {
-        if(sensorGroup->get_distance_value(DS_SENSOR_FRONT) < 60 )
+        if(sensorGroup->get_generic_value(DS_SENSOR_FRONT) < 55 )
             break;
         follow_line(0.05,0.0);
     }
@@ -174,11 +174,11 @@ void LineFollower::follow_line_initial_phase()
 {
     follow_line_striaght();
 
-    int color = sensorGroup->detect_color_patch();
+    int color = sensorGroup->get_colour(CAM_ARM);
 
     if (((colorPatch != -1 && color == 4) || sensorGroup->get_encoder_val(0) > 155) && !colorPrinted)
     {
-        sensorGroup->print_color_patch();
+        sensorGroup->print_color_patch(1);
         colorPrinted = true;
     }
 
@@ -197,7 +197,7 @@ void LineFollower::follow_line_initial_phase()
     {
         if (!colorPrinted)
         {
-            sensorGroup->print_color_patch();
+            sensorGroup->print_color_patch(1);
             colorPrinted = true;
         }
         update_state();
@@ -227,7 +227,7 @@ void LineFollower::follow_line_end_phase()
 
     bool junctionAhead = sensorGroup->is_junction_detected();
 
-    if (junctionAhead || sensorGroup->detect_color_patch() != colorPatch)
+    if (junctionAhead || sensorGroup->get_colour(CAM_ARM) != colorPatch)
     {
         if (junctionAhead)
         {
@@ -578,8 +578,20 @@ void LineFollower::travel_maze()
 void LineFollower::grab_box_detect_color()
 {
     set_servo(POS_ARM_DOWN);
+    if (farBoxDetected == true){
+        frontFaceColour = sensorGroup->get_colour(CAM_BACK);
+        sensorGroup->print_color_patch(frontFaceColour);
+    }
     set_servo(POS_BOX_DOWN);
+    if (nearBoxDetected == true){
+        frontFaceColour = sensorGroup->get_colour(CAM_FRONT);
+        sensorGroup->print_color_patch(frontFaceColour);
+    }
+    // sensorGroup->get_colour(CAM_FRONT);
+    // sensorGroup->print_color_patch();
     set_servo(POS_ARM_UP);
+    bottomFaceColour = sensorGroup->get_colour(CAM_ARM);
+    sensorGroup->print_color_patch(bottomFaceColour);
     //color detection code
 }
 
@@ -635,22 +647,25 @@ void LineFollower::circular_path_task()
 
 void LineFollower::task()
 {
-    go_forward_specific_distance(2.5);
-    follow_line_until_junc_detect();
-    complete_turn(LEFT);
-    follow_line_until_wall_detect(); 
-    follow_wall_until_line_detect();
-    follow_line_until_junc_detect();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect();
-    circular_path_task();
-    follow_line_until_junc_detect();
-    //cout<<"done"<<endl;
-    complete_turn(LEFT);
-    follow_line_until_junc_detect();
-    motorGroup->robot_stop();
+    // go_forward_specific_distance(2.5);
+    // follow_line_until_junc_detect();
+    // complete_turn(LEFT);
+    // follow_line_until_wall_detect(); 
+    // follow_wall_until_line_detect();
+    // follow_line_until_junc_detect();
+    // complete_turn(RIGHT);
+    // follow_line_until_junc_detect();
+    // complete_turn(RIGHT);
+    // follow_line_until_junc_detect();
+    // circular_path_task();
+    // follow_line_until_junc_detect();
+    // //cout<<"done"<<endl;
+    // complete_turn(LEFT);
+    // follow_line_until_junc_detect();
+    // motorGroup->robot_stop();
+
+    follow_line_until_box_detect();
+    grab_box_detect_color();
 
     // complete_turn(RIGHT);
 
