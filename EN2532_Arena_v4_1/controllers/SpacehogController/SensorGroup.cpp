@@ -118,8 +118,10 @@ int SensorGroup::qtr_read_line()
             return 7000;
         else if (previousQTR_0 == 1)
             return 0;
-        else
-            cout<<"undefined value at qtr read line"<<endl;
+        else{
+            //cout<<"undefined value at qtr read line"<<endl;
+            return 3500;
+        }
     }
 
     previousQTR_7 = irValues[QTR_7];

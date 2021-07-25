@@ -56,7 +56,7 @@ extern "C"
         
         void complete_turn(int dir, bool goForward = true);
         void go_forward_specific_distance(double distance);
-        void go_forward_specific_distance_curve(double distance);
+        void go_forward_specific_distance_curve(double distance, int dir);
 
         void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);

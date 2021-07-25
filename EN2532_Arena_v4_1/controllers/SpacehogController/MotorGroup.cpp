@@ -44,6 +44,14 @@ void MotorGroup::set_velocity(float leftSpeed, float rightSpeed)
     // wheels[3]->setVelocity(rightSpeed);
 }
 
+void MotorGroup::robot_stop()
+{
+    wheels[0]->setVelocity(0.0);
+    wheels[1]->setVelocity(0.0);
+    // wheels[2]->setVelocity(leftSpeed);
+    // wheels[3]->setVelocity(rightSpeed);
+}
+
 void MotorGroup::set_position(double leftPosition, double rightPosition)
 {
     wheels[0]->setPosition(leftPosition); //left

@@ -1,0 +1,105 @@
+#VRML_OBJ R2021a utf8
+DEF multi_coloured_box_MR_Robot Solid {
+  translation 0 -0.06 0
+  rotation 0 1 0 -5.307179586466759e-06
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.2
+        metalness 0
+      }
+      geometry DEF planes Plane {
+        size 0.05 0.05
+      }
+    }
+    Transform {
+      translation 0 -0.05 0
+      rotation 1 0 0 -3.141592653589793
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 1 0 0
+            roughness 0.2
+            metalness 0
+          }
+          geometry USE planes
+        }
+      ]
+    }
+    Transform {
+      translation 0 -0.025 0.025
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 1
+            roughness 0.2
+            metalness 0
+          }
+          geometry USE planes
+        }
+      ]
+    }
+    Transform {
+      translation 0 -0.025 -0.025
+      rotation 1 0 0 -1.5707996938995747
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 1
+            roughness 0.2
+            metalness 0
+          }
+          geometry USE planes
+        }
+      ]
+    }
+    Transform {
+      translation 0.025 -0.025 0
+      rotation 0 0 1 -1.5707953071795862
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 0
+            roughness 0.2
+            metalness 0
+          }
+          geometry DEF green_plane Plane {
+            size 0.05 0.05
+          }
+        }
+      ]
+    }
+    Transform {
+      translation -0.025 -0.025 0
+      rotation 0 0 1 1.5707996938995747
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 0
+            roughness 0.2
+            metalness 0
+          }
+          geometry USE green_plane
+        }
+      ]
+    }
+  ]
+  name "multi_coloured_box_MR_Robot"
+  boundingObject Transform {
+    translation 0 -0.025 0
+    children [
+      Box {
+        size 0.05 0.05 0.05
+      }
+    ]
+  }
+  physics Physics {
+    density -1
+    mass 0.02
+    centerOfMass [
+      0 -0.025 0
+    ]
+  }
+}

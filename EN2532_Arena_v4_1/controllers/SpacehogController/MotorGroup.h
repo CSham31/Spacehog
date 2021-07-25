@@ -17,6 +17,7 @@ public:
 
     void enable_motor_velocity_control();
     void set_velocity(float leftSpeed, float rightSpeed);
+    void robot_stop();
     void set_position(double leftPosition, double rightPosition);
     void set_control_pid(float val1, float val2,float val3);
 

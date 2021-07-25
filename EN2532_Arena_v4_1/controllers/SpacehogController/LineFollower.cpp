@@ -296,7 +296,7 @@ void LineFollower::go_forward_specific_distance(double distance)
     motorGroup->enable_motor_velocity_control();
 }
 
-void LineFollower::go_forward_specific_distance_curve(double distance)
+void LineFollower::go_forward_specific_distance_curve(double distance, int dir)
 {
 
     sensorGroup->stabilize_encoder(this);
@@ -306,9 +306,15 @@ void LineFollower::go_forward_specific_distance_curve(double distance)
 
     motorGroup->set_control_pid(4.5, 0, 0);
     motorGroup->set_velocity(7.5, 7.5);
-
-    motorGroup->set_position(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
-    passive_wait_curve_path(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
+    if (dir == LEFT)
+    {
+        motorGroup->set_position(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
+        passive_wait_curve_path(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
+    }
+    else{
+        motorGroup->set_position(distance + initialLeftENcount, distance-2.5 + initialRightENcount);
+        passive_wait_curve_path(distance + initialLeftENcount, distance-2.5 + initialRightENcount);
+    }
     motorGroup->enable_motor_velocity_control();
 }
 
@@ -606,24 +612,24 @@ void LineFollower::circular_path_task()
     complete_turn(RIGHT);
     cout<<"after turn"<<endl;
     follow_line_until_junc_detect();
-    go_forward_specific_distance_curve(7.5);
+    go_forward_specific_distance_curve(7.5,LEFT);
     if (box_detected == true)
     {
         circular_path_middle_task();
         complete_turn(LEFT,false);
         follow_line_until_junc_detect();
-        //go_forward_specific_distance_curve(7.5);        //change this to left
-        complete_turn(RIGHT);
+        go_forward_specific_distance_curve(7.5,LEFT);        //change this to left
+        complete_turn(RIGHT,false);
     }
     else                         //this case we assume that box is in the second cross line for sure
     {
         follow_line_until_junc_detect();
-        go_forward_specific_distance_curve(7.5);
+        go_forward_specific_distance_curve(7.5,LEFT);
         circular_path_middle_task();
         complete_turn(RIGHT,false);
         follow_line_until_junc_detect();
-        //go_forward_specific_distance_curve(7.5);        //change this to left
-        complete_turn(LEFT);
+        go_forward_specific_distance_curve(7.5,RIGHT);        //change this to left
+        complete_turn(LEFT,false);
     }
 }
 
@@ -633,16 +639,18 @@ void LineFollower::task()
     follow_line_until_junc_detect();
     complete_turn(LEFT);
     follow_line_until_wall_detect(); 
-    cout<<"here"<<endl;
     follow_wall_until_line_detect();
     follow_line_until_junc_detect();
     complete_turn(RIGHT);
     follow_line_until_junc_detect();
     complete_turn(RIGHT);
     follow_line_until_junc_detect();
-    //cout<<"here"<<endl;
     circular_path_task();
-
+    follow_line_until_junc_detect();
+    //cout<<"done"<<endl;
+    complete_turn(LEFT);
+    follow_line_until_junc_detect();
+    motorGroup->robot_stop();
 
     // complete_turn(RIGHT);
 
