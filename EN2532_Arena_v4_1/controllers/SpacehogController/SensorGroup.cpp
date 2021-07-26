@@ -173,7 +173,7 @@ bool SensorGroup::is_wall_exit()
         return false;
 }
 
-int SensorGroup::is_pillar_detected(int side)
+int SensorGroup::is_box_detected(int side)
 {
     float distance;
 
@@ -191,6 +191,21 @@ int SensorGroup::is_pillar_detected(int side)
         return 0;
 }
 
+bool SensorGroup::is_pillar_detected(int side)
+{
+    float distance;
+
+    if (side == LEFT)
+        distance = get_generic_value(TOF_LEFT); 
+    else 
+        distance = get_generic_value(TOF_RIGHT); 
+    
+
+    if (distance < 15 ) 
+        return 1;
+    else
+        return 0;
+}
 
 bool SensorGroup::is_gate_detected(int sensor)
 {

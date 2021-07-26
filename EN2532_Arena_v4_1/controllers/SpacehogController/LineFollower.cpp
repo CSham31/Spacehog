@@ -4,6 +4,7 @@
 #include "SensorGroup.h"
 #include "MotorGroup.h"
 #include <math.h>
+#include <cmath>
 #include <bits/stdc++.h>
 
 #define TIME_STEP 16
@@ -63,12 +64,12 @@ void LineFollower::passive_wait_curve_path(double targetLeft, double targetRight
         if (step(TIME_STEP) == -1)
             exit(EXIT_SUCCESS);
 
-        if ((sensorGroup->is_pillar_detected(LEFT) == 1) && (box_detected == false)) //secondition is to ensure that same box dont get detected multiple times
+        if ((sensorGroup->is_box_detected(LEFT) == 1) && (box_detected == false)) //secondition is to ensure that same box dont get detected multiple times
         {
             nearBoxDetected = true;
             box_detected = true;
         }
-        else if ((sensorGroup->is_pillar_detected(LEFT) == 2) && (box_detected == false))
+        else if ((sensorGroup->is_box_detected(LEFT) == 2) && (box_detected == false))
         {
             farBoxDetected = true;
             box_detected = true;
@@ -163,6 +164,36 @@ void LineFollower::follow_line_until_segment_detect()
     {
         if(sensorGroup->is_line_segment_detected() == true)
             break;
+        follow_line(0.01,0.0,2.5,5.0,7.5);
+    }
+
+}
+
+void LineFollower::follow_line_and_count_pillars()
+{
+    bool pillarDetected = false;
+
+    while (step(TIME_STEP) != -1)
+    {
+        if(sensorGroup->is_junction_detected() == true)
+        {
+            cout<<"pillar count : "<<pillarCount<<endl;
+            break;
+        }
+
+        if (sensorGroup->is_pillar_detected(rampDirection) == true)
+        {
+            pillarDetected = true;
+            //cout<<pillarDetected<<endl;
+        }
+
+        if ((pillarDetected == true) and (sensorGroup->is_pillar_detected(rampDirection) == 0 ))
+        {
+            pillarCount += 1;
+            pillarDetected = false;
+            //cout<<"detected"<<endl;
+        }
+        
         follow_line(0.01,0.0,2.5,5.0,7.5);
     }
 
@@ -302,7 +333,7 @@ void LineFollower::complete_turn(int dir, bool goForward)
     if (goForward == true)
     {
         go_forward_specific_distance(6.0);
-        cout<<"forward"<<endl;
+        //cout<<"forward"<<endl;
     }
 
     sensorGroup->stabilize_encoder(this);
@@ -672,6 +703,16 @@ void LineFollower::travel_maze()
     }
 }
 
+void LineFollower::determine_direction()
+{
+    if ((abs(frontFaceColour - bottomFaceColour) % 2) == 1)
+        rampDirection = RIGHT;
+    else
+        rampDirection = LEFT;
+
+    cout<<"front clr "<<frontFaceColour<<" bottom clr "<<bottomFaceColour<<" ramp dir "<<rampDirection<<endl;
+}
+
 void LineFollower::grab_box_detect_color()
 {
     set_servo(POS_ARM_DOWN);
@@ -690,6 +731,7 @@ void LineFollower::grab_box_detect_color()
     set_servo(POS_ARM_UP);
     bottomFaceColour = sensorGroup->get_colour(CAM_ARM);
     sensorGroup->print_color_patch(bottomFaceColour);
+    determine_direction();
     //color detection code
 }
 
@@ -751,20 +793,39 @@ void LineFollower::circular_path_task()
 
 void LineFollower::task()
 {
-    // go_forward_specific_distance(2.5);
-    // follow_line_until_junc_detect_fast();
-    // complete_turn(LEFT);
-    // follow_line_until_wall_detect(); 
-    // follow_wall_until_line_detect();
-    // follow_line_until_junc_detect_fast();
-    // complete_turn(RIGHT);
-    // follow_line_until_junc_detect_fast();
-    // complete_turn(RIGHT);
-    // follow_line_until_junc_detect_fast();
-    // circular_path_task();
-    // follow_line_until_junc_detect_slow();
-    // //cout<<"done"<<endl;
-    // complete_turn(LEFT);
+    go_forward_specific_distance(2.5);
+    follow_line_until_junc_detect_fast();
+    complete_turn(LEFT);
+    follow_line_until_wall_detect(); 
+    follow_wall_until_line_detect();        //wall following
+    follow_line_until_junc_detect_fast();
+    complete_turn(RIGHT);
+    follow_line_until_junc_detect_fast();
+    complete_turn(RIGHT);
+    follow_line_until_junc_detect_fast();
+    circular_path_task();                   //entered to the circle
+    follow_line_until_junc_detect_slow();
+    complete_turn(rampDirection);    //on top of ramp
+    follow_line_and_count_pillars();
+    if (pillarCount % 2 != 0)
+    {
+        complete_turn(BACK,false);
+        follow_line_until_junc_detect_fast();
+        go_forward_specific_distance(3.0);
+        follow_line_until_junc_detect_fast();
+        cout<<"here"<<endl;
+        if (rampDirection == LEFT)
+            complete_turn(RIGHT);
+        else
+            complete_turn(LEFT);
+    }else{
+        complete_turn(rampDirection);
+    }
+    follow_line_until_segment_detect();
+    navigate_gates();
+
+
+
     // follow_line_until_junc_detect_fast();
     // motorGroup->robot_stop();
 
@@ -773,7 +834,9 @@ void LineFollower::task()
     // follow_line_until_junc_detect_slow();
 
 
-    navigate_gates();
+    //navigate_gates();
+
+    //cout<<0%2<<endl;
 
     //cout<<sensorGroup->is_gate_detected(DS_SENSOR_FRONT)<<endl;
 
@@ -811,7 +874,7 @@ void LineFollower::test()
     //motorGroup->set_velocity(7.0, 7.0);
     cout<<sensorGroup->get_distance_value(DS_SENSOR_FRONT)<<endl;
     //cout<<sensorGroup->is_wall(RIGHT)<<endl;
-    //cout<<sensorGroup->is_pillar_detected(RIGHT)<<endl;
+    //cout<<sensorGroup->is_box_detected(RIGHT)<<endl;
     //follow_both_walls(0.005,0.1,100);
     //complete_turn(RIGHT);
 

@@ -37,7 +37,8 @@ public:
     bool is_wall_entrance();
     bool is_wall_exit();
 
-    int is_pillar_detected(int side);
+    int is_box_detected(int side);
+    bool is_pillar_detected(int side);
     bool is_gate_detected(int sensor);
 
     int qtr_read_line();

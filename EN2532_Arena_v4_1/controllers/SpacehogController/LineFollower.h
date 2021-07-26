@@ -40,6 +40,7 @@ extern "C"
         void grab_box_detect_color();
         void circular_path_middle_task();
         void navigate_gates();
+        void determine_direction();
 
         void passive_wait(double targetLeft, double targetRight);
         void passive_wait_servo(int servo, double target);
@@ -51,6 +52,7 @@ extern "C"
         void follow_line_until_junc_detect_fast();
         void follow_line_until_junc_detect_slow();
         void follow_line_until_segment_detect();
+        void follow_line_and_count_pillars();
         void follow_line_until_wall_detect();
         void follow_line_until_box_detect();
         void follow_line_striaght();
@@ -160,6 +162,9 @@ extern "C"
 
         int frontFaceColour = 4;
         int bottomFaceColour = 4;
+
+        int rampDirection = 0;
+        int pillarCount = 0;
 
 
     };
