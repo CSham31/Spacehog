@@ -3,41 +3,68 @@
 
 #define TIME_STEP 16
 using namespace webots;
+using namespace std;
 
-int main(int argc, char **argv) {
-  Robot *robot = new Robot();
-  Motor *wheels[4];
+float gateVelocity = 1.0;
+float UP = -1.57;
+float DOWN = 0;
+
+int TIME_PERIOD = 20;
+int currentTime = 0;
+int unitTime = 0;
+
+int offset = 1; //keep this below 7
+
+Robot *robot = new Robot();
+Motor *wheels[4];
+
+void initialize_gates()
+{
   char wheels_names[4][8] = {"gate_1", "gate_2", "gate_3", "gate_4"};
   for (int i = 0; i < 4; i++) {
     wheels[i] = robot->getMotor(wheels_names[i]);
-    // wheels[i]->setPosition(INFINITY);
-    // wheels[i]->setVelocity(0.0);
   }
-  //int avoidObstacleCounter = 0;
+}
+
+void first_gte(float dir)
+{
+  wheels[0]->setPosition(dir);
+  wheels[2]->setPosition(dir);
+  wheels[0]->setVelocity(gateVelocity);
+  wheels[2]->setVelocity(gateVelocity);
+}
+
+void second_gte(float dir)
+{
+  wheels[1]->setPosition(dir);
+  wheels[3]->setPosition(dir);
+  wheels[1]->setVelocity(gateVelocity);
+  wheels[3]->setVelocity(gateVelocity);
+}
+
+int main(int argc, char **argv) {
+
+  initialize_gates();
+
   while (robot->step(TIME_STEP) != -1) {
-    // double leftSpeed = 1.0;
-    // double rightSpeed = 1.0;
-    // if (avoidObstacleCounter > 0) {
-    //   avoidObstacleCounter--;
-    //   leftSpeed = 1.0;
-    //   rightSpeed = -1.0;
-    // } else { // read sensors
-    //   for (int i = 0; i < 2; i++) {
-    //     if (ds[i]->getValue() < 950.0)
-    //       avoidObstacleCounter = 100;
-    //   }
-    // }
 
+    currentTime = robot->getTime();
+    unitTime = currentTime % TIME_PERIOD;
 
-    wheels[0]->setPosition(-1.57);
-    wheels[1]->setPosition(-1.57);
-    wheels[2]->setPosition(-1.57);
-    wheels[3]->setPosition(-1.57);
+    if (unitTime <3+offset){
+      first_gte(UP);
+      second_gte(DOWN);
+    }else if (unitTime < 10+offset){
+      first_gte(UP);
+      second_gte(UP);
+    }else if (unitTime < 13+offset){
+      first_gte(DOWN);
+      second_gte(UP);
+    }else{
+      first_gte(DOWN);
+      second_gte(DOWN);
+    }
 
-    wheels[0]->setVelocity(0.5);
-    wheels[1]->setVelocity(0.5);
-    wheels[2]->setVelocity(0.5);
-    wheels[3]->setVelocity(0.5);
   }
   delete robot;
   return 0;  // EXIT_SUCCESS
