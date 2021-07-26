@@ -6,7 +6,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
-#define TIME_STEP 8
+#define TIME_STEP 16
 using namespace webots;
 using namespace std;
 
@@ -84,7 +84,7 @@ void LineFollower::passive_wait_curve_path(double targetLeft, double targetRight
 
 ////////////////////////////////////////////////////////// follow line methods /////////////////////////////////////////////////////////////////////////
 
-void LineFollower::follow_line(float Kp, float Kd)
+void LineFollower::follow_line(float Kp, float Kd, float minSpd, float baseSpd, float maxSpd)
 {
     // leftSpeed = 7.5;
     // rightSpeed = 7.5;
@@ -98,52 +98,82 @@ void LineFollower::follow_line(float Kp, float Kd)
 
     lineFollowPreviousError = error;
 
-    // leftSpeed = MAX_VELOCITY;
-    // rightSpeed = MAX_VELOCITY;
+    // leftSpeed = WALL_MAX_VELOCITY;
+    // rightSpeed = WALL_MAX_VELOCITY;
 
-    rightSpeed = WALL_FOLLOW_BASE_SPEED - controlValue;
-    leftSpeed = WALL_FOLLOW_BASE_SPEED + controlValue;
+    rightSpeed = baseSpd - controlValue;
+    leftSpeed = baseSpd + controlValue;
 
-    if (rightSpeed < MIN_VELOCITY)
-        rightSpeed = MIN_VELOCITY;
-    else if (rightSpeed > MAX_VELOCITY)
-        rightSpeed = MAX_VELOCITY;
+    if (rightSpeed < minSpd)
+        rightSpeed = minSpd;
+    else if (rightSpeed > maxSpd)
+        rightSpeed = maxSpd;
 
-    if (leftSpeed < MIN_VELOCITY)
-        leftSpeed = MIN_VELOCITY;
-    else if (leftSpeed > MAX_VELOCITY)
-        leftSpeed = MAX_VELOCITY;
+    if (leftSpeed < minSpd)
+        leftSpeed = minSpd;
+    else if (leftSpeed > maxSpd)
+        leftSpeed = maxSpd;
 
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
 
-void LineFollower::follow_line_until_junc_detect()
+void LineFollower::follow_line_until_junc_detect_fast()
 {
-    while (step(8) != -1)
+    int count = DEACCELERATE_COUNT;
+    while (step(TIME_STEP) != -1)
     {
         if(sensorGroup->is_junction_detected() == true)
             break;
-        follow_line(0.05,0.0);
+        if (count>-1)
+        {
+            baseSpeed = CONST_BASE_SPEED - count;
+            count-=1;
+        }
+        follow_line(0.001,0.0,7.0,12.0,17.0);
     }
+
+}
+
+void LineFollower::follow_line_until_junc_detect_slow()
+{
+    while (step(TIME_STEP) != -1)
+    {
+        if(sensorGroup->is_junction_detected() == true)
+            break;
+        follow_line(0.01,0.0,2.5,5.0,7.5);
+    }
+
 }
 
 void LineFollower::follow_line_until_wall_detect()
 {
-    while (step(8) != -1)
+    int count = DEACCELERATE_COUNT;
+    while (step(TIME_STEP) != -1)
     {
         if(sensorGroup->is_wall_entrance() == true)
             break;
-        follow_line(0.05,0.0);
+        if (count>-1)
+        {
+            baseSpeed = CONST_BASE_SPEED - count;
+            count-=1;
+        }
+        follow_line(0.01,0.0,2.5,5.0,7.5);
     }
 }
 
 void LineFollower::follow_line_until_box_detect()
 {
-    while (step(8) != -1)
+    int count = DEACCELERATE_COUNT;
+    while (step(TIME_STEP) != -1)
     {
         if(sensorGroup->get_generic_value(DS_SENSOR_FRONT) < 55 )
             break;
-        follow_line(0.05,0.0);
+        if (count>-1)
+        {
+            baseSpeed = CONST_BASE_SPEED - count;
+            count-=1;
+        }
+        follow_line(0.001,0.0,7.0,12.0,17.0);
     }
     motorGroup->set_velocity(0, 0);
 }
@@ -248,7 +278,7 @@ void LineFollower::complete_turn(int dir, bool goForward)
 {
     if (goForward == true)
     {
-        go_forward_specific_distance(5.9);
+        go_forward_specific_distance(6.0);
         cout<<"forward"<<endl;
     }
 
@@ -271,7 +301,7 @@ void LineFollower::complete_turn(int dir, bool goForward)
     }
 
     motorGroup->set_control_pid(4.5, 0, 0);
-    motorGroup->set_velocity(7.5, 7.5);
+    motorGroup->set_velocity(10, 10);
 
     motorGroup->set_position(leftCount, rightCount);
 
@@ -374,21 +404,21 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
 
     wallFollowPreviousError = error;
 
-    leftSpeed = MAX_VELOCITY;
-    rightSpeed = MAX_VELOCITY;
+    leftSpeed = WALL_MAX_VELOCITY;
+    rightSpeed = WALL_MAX_VELOCITY;
 
     rightSpeed = WALL_FOLLOW_BASE_SPEED - controlValue;
     leftSpeed = WALL_FOLLOW_BASE_SPEED + controlValue;
 
-    if (rightSpeed < MIN_VELOCITY)
-        rightSpeed = MIN_VELOCITY;
-    else if (rightSpeed > MAX_VELOCITY)
-        rightSpeed = MAX_VELOCITY;
+    if (rightSpeed < WALL_MIN_VELOCITY)
+        rightSpeed = WALL_MIN_VELOCITY;
+    else if (rightSpeed > WALL_MAX_VELOCITY)
+        rightSpeed = WALL_MAX_VELOCITY;
 
-    if (leftSpeed < MIN_VELOCITY)
-        leftSpeed = MIN_VELOCITY;
-    else if (leftSpeed > MAX_VELOCITY)
-        leftSpeed = MAX_VELOCITY;
+    if (leftSpeed < WALL_MIN_VELOCITY)
+        leftSpeed = WALL_MIN_VELOCITY;
+    else if (leftSpeed > WALL_MAX_VELOCITY)
+        leftSpeed = WALL_MAX_VELOCITY;
 
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
@@ -406,21 +436,23 @@ void LineFollower::follow_wall_until_line_detect()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LineFollower::set_servo(int state)
+void LineFollower::set_servo(int state, bool wait)
 {
     if (state <3)       //arm servo
     {
-        motorGroup->set_control_pid(4.5, 0, 0);
-        motorGroup->set_velocity_servo(ARM, 0.5);
+        motorGroup->set_control_pid(6, 0, 0);
+        motorGroup->set_velocity_servo(ARM, 1);
         motorGroup->set_position_servo(ARM, servoPosition[state]);
-        passive_wait_servo(ARM, servoPosition[state]);
+        if (wait == true)
+            passive_wait_servo(ARM, servoPosition[state]);
     }
     else
     {
-        motorGroup->set_control_pid(4.5, 0, 0);
-        motorGroup->set_velocity_servo(BOX, 0.5);
+        motorGroup->set_control_pid(6, 0, 0);
+        motorGroup->set_velocity_servo(BOX, 1);
         motorGroup->set_position_servo(BOX, servoPosition[state]);
-        passive_wait_servo(BOX, servoPosition[state]);
+        if (wait == true)
+            passive_wait_servo(BOX, servoPosition[state]);
     }
 }
 
@@ -589,6 +621,7 @@ void LineFollower::grab_box_detect_color()
     }
     // sensorGroup->get_colour(CAM_FRONT);
     // sensorGroup->print_color_patch();
+    cout<<"up"<<endl;
     set_servo(POS_ARM_UP);
     bottomFaceColour = sensorGroup->get_colour(CAM_ARM);
     sensorGroup->print_color_patch(bottomFaceColour);
@@ -598,6 +631,7 @@ void LineFollower::grab_box_detect_color()
 void LineFollower::circular_path_middle_task()
 {
     complete_turn(LEFT,false);  // false to stop robot going specific distance forward
+    set_servo(POS_BOX_UP,false);
 
     if (nearBoxDetected == true)
     {
@@ -605,7 +639,7 @@ void LineFollower::circular_path_middle_task()
         grab_box_detect_color();
     }
 
-    follow_line_until_junc_detect();
+    follow_line_until_junc_detect_fast();
     go_forward_specific_distance(3.0); //to pass the middle cross
     
     if (farBoxDetected == true)
@@ -614,58 +648,79 @@ void LineFollower::circular_path_middle_task()
         grab_box_detect_color();
     }
 
-    follow_line_until_junc_detect();
+    follow_line_until_junc_detect_fast();
     go_forward_specific_distance(5.9);
+    //set_servo(POS_ARM_DEFAULT,false); 
     set_servo(POS_BOX_UP);          //release the box
+    //set_servo(POS_BOX_UP);     
+    //set_servo(POS_ARM_UP,false);
+    //set_servo(POS_BOX_DEFAULT,false);       
 }
 
 void LineFollower::circular_path_task()
 {
     complete_turn(RIGHT);
     cout<<"after turn"<<endl;
-    follow_line_until_junc_detect();
+    follow_line_until_junc_detect_slow();
     go_forward_specific_distance_curve(7.5,LEFT);
     if (box_detected == true)
     {
         circular_path_middle_task();
         complete_turn(LEFT,false);
-        follow_line_until_junc_detect();
+        follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,LEFT);        //change this to left
         complete_turn(RIGHT,false);
     }
     else                         //this case we assume that box is in the second cross line for sure
     {
-        follow_line_until_junc_detect();
+        follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,LEFT);
         circular_path_middle_task();
         complete_turn(RIGHT,false);
-        follow_line_until_junc_detect();
+        follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,RIGHT);        //change this to left
         complete_turn(LEFT,false);
     }
+    set_servo(POS_BOX_DEFAULT,false); 
 }
 
 void LineFollower::task()
 {
-    // go_forward_specific_distance(2.5);
-    // follow_line_until_junc_detect();
-    // complete_turn(LEFT);
-    // follow_line_until_wall_detect(); 
-    // follow_wall_until_line_detect();
-    // follow_line_until_junc_detect();
-    // complete_turn(RIGHT);
-    // follow_line_until_junc_detect();
-    // complete_turn(RIGHT);
-    // follow_line_until_junc_detect();
-    // circular_path_task();
-    // follow_line_until_junc_detect();
-    // //cout<<"done"<<endl;
-    // complete_turn(LEFT);
-    // follow_line_until_junc_detect();
-    // motorGroup->robot_stop();
+    go_forward_specific_distance(2.5);
+    follow_line_until_junc_detect_fast();
+    complete_turn(LEFT);
+    follow_line_until_wall_detect(); 
+    follow_wall_until_line_detect();
+    follow_line_until_junc_detect_fast();
+    complete_turn(RIGHT);
+    follow_line_until_junc_detect_fast();
+    complete_turn(RIGHT);
+    follow_line_until_junc_detect_fast();
+    circular_path_task();
+    follow_line_until_junc_detect_slow();
+    //cout<<"done"<<endl;
+    complete_turn(LEFT);
+    follow_line_until_junc_detect_fast();
+    motorGroup->robot_stop();
 
-    follow_line_until_box_detect();
-    grab_box_detect_color();
+    // follow_line_until_junc_detect_fast();
+    // circular_path_task();
+    // follow_line_until_junc_detect_slow();
+
+
+
+
+    //follow_line_until_junc_detect();
+    //complete_turn(BACK,false);
+    // follow_line_until_junc_detect();
+    // complete_turn(LEFT);
+
+
+    // set_servo(POS_BOX_UP);
+    // set_servo(POS_ARM_DOWN);
+
+    // follow_line_until_box_detect();
+    // grab_box_detect_color();
 
     // complete_turn(RIGHT);
 

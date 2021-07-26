@@ -6,7 +6,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
-#define TIME_STEP 8
+#define TIME_STEP 16
 using namespace webots;
 using namespace std;
 

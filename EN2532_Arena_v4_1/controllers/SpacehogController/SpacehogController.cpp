@@ -1,5 +1,5 @@
 #include "LineFollower.h"
-#define TIME_STEP 8
+#define TIME_STEP 16
 
 int main(int argc, char **argv)
 {
