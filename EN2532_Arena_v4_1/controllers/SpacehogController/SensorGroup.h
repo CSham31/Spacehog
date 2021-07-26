@@ -31,12 +31,14 @@ public:
     void print_color_patch(int color);
 
     bool is_junction_detected();
+    bool is_line_segment_detected();
     void enable_wall_follow();
     bool is_wall(int side);
     bool is_wall_entrance();
     bool is_wall_exit();
 
     int is_pillar_detected(int side);
+    bool is_gate_detected(int sensor);
 
     int qtr_read_line();
 
@@ -79,6 +81,7 @@ private:
     int previousQTR_7 = 0;
     int previousQTR_0 = 0;
 
+    int DS_SENSOR_BOX = 3;
     int DS_SENSOR_FRONT = 2;
     int DS_SENSOR_RIGHT = 1;
     int DS_SENSOR_LEFT = 0;
@@ -112,6 +115,7 @@ private:
 
     int FAR_RANGE = 140;
     int NEAR_RANGE = 70;
+    int GATE_RANGE = 300;
     
 };
 

@@ -99,6 +99,15 @@ bool SensorGroup::is_junction_detected()
         return false;
 }
 
+bool SensorGroup::is_line_segment_detected()
+{
+    if ((get_digital_value(QTR_0) == WHITE) and (get_digital_value(QTR_1) == WHITE) and (get_digital_value(QTR_2) == WHITE) and (get_digital_value(QTR_3) == WHITE) 
+    and (get_digital_value(QTR_4) == WHITE) and (get_digital_value(QTR_5) == WHITE) and (get_digital_value(QTR_6) == WHITE) and (get_digital_value(QTR_7) == WHITE))
+        return true;
+    else
+        return false;
+}
+
 int SensorGroup::qtr_read_line()
 {
     int irValues[8];
@@ -178,6 +187,15 @@ int SensorGroup::is_pillar_detected(int side)
         return 1;
     else if ( distance < FAR_RANGE) 
         return 2;
+    else
+        return 0;
+}
+
+
+bool SensorGroup::is_gate_detected(int sensor)
+{
+    if (get_generic_value(sensor) < GATE_RANGE ) 
+        return 1;
     else
         return 0;
 }

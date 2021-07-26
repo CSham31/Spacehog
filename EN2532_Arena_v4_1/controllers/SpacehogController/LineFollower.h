@@ -39,15 +39,18 @@ extern "C"
         void circular_path_task();
         void grab_box_detect_color();
         void circular_path_middle_task();
+        void navigate_gates();
 
         void passive_wait(double targetLeft, double targetRight);
         void passive_wait_servo(int servo, double target);
         void passive_wait_curve_path(double targetLeft, double targetRight);
+        void delay(int time);
 
         void follow_line(float Kp, float Kd, float minSpd, float baseSpd, float maxSpd);
         //void follow_line_until_junc_detect();
         void follow_line_until_junc_detect_fast();
         void follow_line_until_junc_detect_slow();
+        void follow_line_until_segment_detect();
         void follow_line_until_wall_detect();
         void follow_line_until_box_detect();
         void follow_line_striaght();
@@ -103,6 +106,7 @@ extern "C"
         float DEACCELERATE_COUNT = 5;
 
          
+        int DS_SENSOR_BOX = 3;
         int DS_SENSOR_FRONT = 2;
         int DS_SENSOR_RIGHT = 1;
         int DS_SENSOR_LEFT = 0;

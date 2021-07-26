@@ -82,6 +82,18 @@ void LineFollower::passive_wait_curve_path(double targetLeft, double targetRight
     } while (dif > DELTA);
 }
 
+void LineFollower::delay(int time)
+{
+    int target = time / TIME_STEP;
+    int count = 0;
+    while (step(TIME_STEP) != -1){
+        count += 1;
+        if (count > target)
+            break;
+
+    }
+}
+
 ////////////////////////////////////////////////////////// follow line methods /////////////////////////////////////////////////////////////////////////
 
 void LineFollower::follow_line(float Kp, float Kd, float minSpd, float baseSpd, float maxSpd)
@@ -139,6 +151,17 @@ void LineFollower::follow_line_until_junc_detect_slow()
     while (step(TIME_STEP) != -1)
     {
         if(sensorGroup->is_junction_detected() == true)
+            break;
+        follow_line(0.01,0.0,2.5,5.0,7.5);
+    }
+
+}
+
+void LineFollower::follow_line_until_segment_detect()
+{
+    while (step(TIME_STEP) != -1)
+    {
+        if(sensorGroup->is_line_segment_detected() == true)
             break;
         follow_line(0.01,0.0,2.5,5.0,7.5);
     }
@@ -433,6 +456,48 @@ void LineFollower::follow_wall_until_line_detect()
     }
     
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void LineFollower::navigate_gates()
+{
+    //int initialTime = 0
+    bool gateOpen = false;
+
+    go_forward_specific_distance(4.0);  
+
+    while (step(TIME_STEP) != -1)
+    {
+        if (sensorGroup->is_gate_detected(DS_SENSOR_FRONT) == true)
+        {
+            cout<<"first detected"<<endl;
+            //initialTime = getTime();
+            while (step(TIME_STEP) != -1)
+            {
+                // if ((getTime()- initialTime) > 3)
+                //     break                   //means gate was closing
+                if (sensorGroup->is_gate_detected(DS_SENSOR_BOX) == true)
+                {
+                    gateOpen = true;
+                    cout<<"second detected"<<endl;
+                    break;
+                }
+                    
+            }
+        }
+        if (gateOpen == true)
+        {
+            gateOpen = false;
+            break;
+        }
+    }
+    delay(2000);
+    follow_line_until_segment_detect();
+    go_forward_specific_distance(3.0);  //to pass the line segment
+    follow_line_until_junc_detect_slow();
+    go_forward_specific_distance(7.5);
+    cout<<"done"<<endl;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -686,29 +751,31 @@ void LineFollower::circular_path_task()
 
 void LineFollower::task()
 {
-    go_forward_specific_distance(2.5);
-    follow_line_until_junc_detect_fast();
-    complete_turn(LEFT);
-    follow_line_until_wall_detect(); 
-    follow_wall_until_line_detect();
-    follow_line_until_junc_detect_fast();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect_fast();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect_fast();
-    circular_path_task();
-    follow_line_until_junc_detect_slow();
-    //cout<<"done"<<endl;
-    complete_turn(LEFT);
-    follow_line_until_junc_detect_fast();
-    motorGroup->robot_stop();
+    // go_forward_specific_distance(2.5);
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(LEFT);
+    // follow_line_until_wall_detect(); 
+    // follow_wall_until_line_detect();
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(RIGHT);
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(RIGHT);
+    // follow_line_until_junc_detect_fast();
+    // circular_path_task();
+    // follow_line_until_junc_detect_slow();
+    // //cout<<"done"<<endl;
+    // complete_turn(LEFT);
+    // follow_line_until_junc_detect_fast();
+    // motorGroup->robot_stop();
 
     // follow_line_until_junc_detect_fast();
     // circular_path_task();
     // follow_line_until_junc_detect_slow();
 
 
+    navigate_gates();
 
+    //cout<<sensorGroup->is_gate_detected(DS_SENSOR_FRONT)<<endl;
 
     //follow_line_until_junc_detect();
     //complete_turn(BACK,false);
