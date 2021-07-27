@@ -731,6 +731,8 @@ void LineFollower::grab_box_detect_color()
     set_servo(POS_ARM_UP);
     bottomFaceColour = sensorGroup->get_colour(CAM_ARM);
     sensorGroup->print_color_patch(bottomFaceColour);
+    sensorGroup->set_LED(LEFT,frontFaceColour);
+    sensorGroup->set_LED(RIGHT,bottomFaceColour);
     determine_direction();
     //color detection code
 }
@@ -823,6 +825,9 @@ void LineFollower::task()
     }
     follow_line_until_segment_detect();
     navigate_gates();
+    sensorGroup->set_LED(LEFT,0);
+    sensorGroup->set_LED(RIGHT,0);
+
 
 
 

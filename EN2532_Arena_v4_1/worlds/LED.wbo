@@ -1,0 +1,26 @@
+#VRML_OBJ R2021a utf8
+DEF LED_1 LED {
+  translation 0.135 0.1 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        metalness 0
+        emissiveIntensity 20
+      }
+      geometry Capsule {
+        bottom FALSE
+        height 0.008
+        radius 0.005
+      }
+    }
+    Shape {
+      appearance BrushedAluminium {
+      }
+      geometry Cylinder {
+        height 0.004
+        radius 0.006
+      }
+    }
+  ]
+  name "led_1"
+}

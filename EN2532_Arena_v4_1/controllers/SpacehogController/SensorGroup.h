@@ -1,6 +1,7 @@
 #include <webots/DistanceSensor.hpp>
 #include <webots/PositionSensor.hpp>
 #include <webots/Camera.hpp>
+#include <webots/LED.hpp>
 
 using namespace webots;
 
@@ -12,6 +13,7 @@ class SensorGroup
 {
 public:
     void initialize(LineFollower* follower);
+    void init_LED(LineFollower *follower);
     void init_distance_sensor(LineFollower* follower);
     void init_qtr_sensor(LineFollower *follower);
     void init_encoders(LineFollower* follower);
@@ -26,6 +28,7 @@ public:
     void stabilize_encoder(LineFollower* follower);
     void stabilize_ir_and_distance_sensors(LineFollower *follower);
     
+    void set_LED(int side,int colour);
     int get_colour(int cam);
     void detect_color_patches();
     void print_color_patch(int color);
@@ -59,6 +62,9 @@ private:
 
     Camera *camera[3];
     char camera_name[3][14] = {"camera","camera_back","camera_front"};
+
+    LED *led[2];
+    char led_name[2][6] = {"led_1","led_2"};
 
     int BLACK = 0;
     int WHITE = 1;

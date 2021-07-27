@@ -1,6 +1,7 @@
 #include <webots/DistanceSensor.hpp>
 #include <webots/PositionSensor.hpp>
 #include <webots/Camera.hpp>
+#include <webots/LED.hpp>
 #include "SensorGroup.h"
 #include "LineFollower.h"
 #include <math.h>
@@ -13,11 +14,19 @@ using namespace std;
 void SensorGroup::initialize(LineFollower *follower)
 {
     follower = follower;
+    init_LED(follower);
     init_distance_sensor(follower);
     init_qtr_sensor(follower);
     init_encoders(follower);
     init_camera(follower);
     stabilize_ir_and_distance_sensors(follower);
+}
+
+void SensorGroup::init_LED(LineFollower *follower)
+{
+  for (int i =0 ; i<2; i++){
+    led[i] = follower->getLED(led_name[i]);
+  }
 }
 
 void SensorGroup::init_distance_sensor(LineFollower *follower)
@@ -61,6 +70,11 @@ void SensorGroup::init_camera(LineFollower *follower)
     camera[i]->enable(TIME_STEP);
 
     }
+}
+
+void SensorGroup::set_LED(int side,int colour)
+{
+    led[side]->set(colour);
 }
 
 float SensorGroup::get_distance_value(int index)
