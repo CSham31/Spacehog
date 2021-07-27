@@ -13,27 +13,27 @@ extern "C"
 {
 #endif
 
-    enum State
-    {
-        INITIALIZE,
-        LINEFOLLOW_INITIAL,
-        LINEFOLLOW,
-        LINEFOLLOW_END,
-        WALLFOLLOW,
-        SQUARE,
-        TURN_RIGHT,
-        TURN_LEFT,
-        CAL_FACTORS,
-        FIND_DESTINATION,
-    };
+    // enum State
+    // {
+    //     INITIALIZE,
+    //     LINEFOLLOW_INITIAL,
+    //     LINEFOLLOW,
+    //     LINEFOLLOW_END,
+    //     WALLFOLLOW,
+    //     SQUARE,
+    //     TURN_RIGHT,
+    //     TURN_LEFT,
+    //     CAL_FACTORS,
+    //     FIND_DESTINATION,
+    // };
 
     class LineFollower : public Robot
     {
     public:
         LineFollower();
 
-        void update_state();
-        void travel_maze();
+        //void update_state();
+        //void travel_maze();
         void task();
         void test();
         void circular_path_task();
@@ -55,24 +55,24 @@ extern "C"
         void follow_line_and_count_pillars();
         void follow_line_until_wall_detect();
         void follow_line_until_box_detect();
-        void follow_line_striaght();
-        void follow_line_initial_phase();
-        void follow_line_end_phase();
-        void follow_line_middle_phase();
+        //void follow_line_striaght();
+        //void follow_line_initial_phase();
+        //void follow_line_end_phase();
+        //void follow_line_middle_phase();
         
         
         void complete_turn(int dir, bool goForward = true);
         void go_forward_specific_distance(double distance);
         void go_forward_specific_distance_curve(double distance, int dir);
 
-        void navigate_wall_maze();
+        //void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);
         void follow_wall_until_line_detect();
 
         void set_servo(int state, bool wait = true);
 
-        void find_destination();
-        void find_factors(int n);
+        //void find_destination();
+        //void find_factors(int n);
 
 
 
@@ -80,9 +80,9 @@ extern "C"
         SensorGroup *sensorGroup;
         MotorGroup *motorGroup;
 
-        State currentState = INITIALIZE;
-        int currentInst = 0;
-        State order[12] = {SQUARE, SQUARE, TURN_RIGHT, TURN_LEFT, WALLFOLLOW, TURN_LEFT, TURN_RIGHT, FIND_DESTINATION};
+        //State currentState = INITIALIZE;
+        //int currentInst = 0;
+        //State order[12] = {SQUARE, SQUARE, TURN_RIGHT, TURN_LEFT, WALLFOLLOW, TURN_LEFT, TURN_RIGHT, FIND_DESTINATION};
 
         int BLACK = 0;
         int WHITE = 1;

@@ -19,6 +19,7 @@ void SensorGroup::initialize(LineFollower *follower)
     init_qtr_sensor(follower);
     init_encoders(follower);
     init_camera(follower);
+    stabilize_encoder(follower);
     stabilize_ir_and_distance_sensors(follower);
 }
 
@@ -77,6 +78,12 @@ void SensorGroup::set_LED(int side,int colour)
     led[side]->set(colour);
 }
 
+float SensorGroup::get_ir_value_distance_sensors(int index)     //only for stabilization
+{
+    float val = ds[index]->getValue();
+    return val;
+}
+
 float SensorGroup::get_distance_value(int index)
 {
     float val = ds[index]->getValue();
@@ -84,11 +91,9 @@ float SensorGroup::get_distance_value(int index)
     //return val;
 }
 
-float SensorGroup::get_generic_value(int index)
+float SensorGroup::get_generic_value(int index)     //for TOFs and front sensors
 {
-    //float val = ds[index]->getValue();
     return round(ds[index]->getValue());
-    //return val;
 }
 
 double SensorGroup::get_encoder_val(int index)
@@ -138,7 +143,6 @@ int SensorGroup::qtr_read_line()
     //cout<<irValues[7]<<"  "<<irValues[6]<<"  "<<irValues[1]<<"  "<<irValues[0]<<endl;
     if ((numerator == 0) and (denominator == 0))    // to prevent 0/0 division form happening
     {
-        //cout<<previousQTR_7<<"  "<<previousQTR_0<<endl;
         if (previousQTR_7 == 1)
             return 7000;
         else if (previousQTR_0 == 1)
@@ -155,20 +159,21 @@ int SensorGroup::qtr_read_line()
     return (numerator/denominator);
 }
 
-void SensorGroup::enable_wall_follow()
-{
-    enableWallFollow = true;
-}
+// void SensorGroup::enable_wall_follow()
+// {
+//     enableWallFollow = true;
+// }
+
 bool SensorGroup::is_wall(int side)
 {
     if ((side == RIGHT) and (get_distance_value(DS_SENSOR_RIGHT) < SIDE_WALL_THRESHOLD))
-        return true;// && enableWallFollow;
+        return true;
     else if ((side == LEFT) and (get_distance_value(DS_SENSOR_LEFT) < SIDE_WALL_THRESHOLD))
-        return true;// && enableWallFollow;
+        return true;
     else if ((side == FRONT) and (get_distance_value(DS_SENSOR_FRONT) < FRONT_WALL_THRESHOLD))
-        return true;// && enableWallFollow;
+        return true;
     else
-        return false; //&& enableWallFollow;
+        return false;
 }
 
 bool SensorGroup::is_wall_entrance()
@@ -231,11 +236,11 @@ bool SensorGroup::is_gate_detected(int sensor)
 
 void SensorGroup::stabilize_encoder(LineFollower *follower)
 {
-    if (isnan(get_encoder_val(LEFT)) || isnan(get_encoder_val(RIGHT)))
+    if (isnan(get_encoder_val(LEFT)) || isnan(get_encoder_val(RIGHT)) || isnan(get_encoder_val(2)) || isnan(get_encoder_val(3)))    //2,3 for arm and box servos
     {
         while (follower->step(TIME_STEP) != -1)
         {
-            if (!(isnan(get_encoder_val(LEFT)) && isnan(get_encoder_val(RIGHT))))
+            if (!(isnan(get_encoder_val(LEFT)) && isnan(get_encoder_val(RIGHT)) && isnan(get_encoder_val(2)) && isnan(get_encoder_val(3))))
                 break; //to make sure that encoder dosent return NaN
         }
     }
@@ -245,8 +250,10 @@ void SensorGroup::stabilize_ir_and_distance_sensors(LineFollower *follower)
 {
     while (follower->step(TIME_STEP) != -1)
     {
-        if (!(isnan(get_ir_value(QTR_0)) && isnan(get_ir_value(QTR_1)) && isnan(get_ir_value(QTR_2)) && isnan(get_ir_value(QTR_3)) 
-        && isnan(get_ir_value(DS_SENSOR_FRONT)) && isnan(get_ir_value(DS_SENSOR_LEFT)) && isnan(get_ir_value(DS_SENSOR_RIGHT))))
+        if (!(isnan(get_ir_value_distance_sensors(DS_SENSOR_FRONT)) && isnan(get_ir_value_distance_sensors(DS_SENSOR_LEFT)) && isnan(get_ir_value_distance_sensors(DS_SENSOR_RIGHT)) && isnan(get_ir_value_distance_sensors(DS_SENSOR_BOX)) 
+        && isnan(get_ir_value_distance_sensors(TOF_LEFT)) && isnan(get_ir_value_distance_sensors(TOF_RIGHT)) && isnan(get_ir_value(QTR_0)) && isnan(get_ir_value(QTR_1)) && isnan(get_ir_value(QTR_2))
+        && isnan(get_ir_value(QTR_3)) && isnan(get_ir_value(QTR_4)) && isnan(get_ir_value(QTR_5)) && isnan(get_ir_value(QTR_6)) && isnan(get_ir_value(QTR_7)) && isnan(get_ir_value(LINE_DETECT_LEFT))
+        && isnan(get_ir_value(LINE_DETECT_RIGHT))))
             break; //to make sure that ir and distance sensors dosent return NaN
     }
 }
@@ -290,55 +297,56 @@ int SensorGroup::get_colour(int cam)
             }
         }
     }
+    cout<<"no colour"<<endl;
     return NO_COLOR;
 }
 
-void SensorGroup::detect_color_patches()
-{
-    const unsigned char *IMAGE = camera[0]->getImage();
+// void SensorGroup::detect_color_patches()
+// {
+//     const unsigned char *IMAGE = camera[0]->getImage();
 
 
 
-    int redpix = 0;
-    int greenpix = 0;
-    int bluepix = 0;
+//     int redpix = 0;
+//     int greenpix = 0;
+//     int bluepix = 0;
 
-    int i, j;
-    int ind = 0;
-    bool red_detected = false;
-    bool green_detected = false;
-    bool blue_detected = false;
+//     int i, j;
+//     int ind = 0;
+//     bool red_detected = false;
+//     bool green_detected = false;
+//     bool blue_detected = false;
 
-    for (i = 0; i < WIDTH; i++)
-    {
-        for (j = 0; j < HEIGHT; j++)
-        {
-            redpix = camera[0]->imageGetRed(IMAGE, WIDTH, i, j);
-            bluepix = camera[0]->imageGetBlue(IMAGE, WIDTH, i, j);
-            greenpix = camera[0]->imageGetGreen(IMAGE, WIDTH, i, j);
+//     for (i = 0; i < WIDTH; i++)
+//     {
+//         for (j = 0; j < HEIGHT; j++)
+//         {
+//             redpix = camera[0]->imageGetRed(IMAGE, WIDTH, i, j);
+//             bluepix = camera[0]->imageGetBlue(IMAGE, WIDTH, i, j);
+//             greenpix = camera[0]->imageGetGreen(IMAGE, WIDTH, i, j);
 
-            if (!red_detected && (redpix > 4 * greenpix) && (redpix > 4 * bluepix))
-            {
-                COLORS[ind] = RED;
-                red_detected = true;
-                ind += 1;
-            }
-            else if (!green_detected && (greenpix > 4 * redpix) && (greenpix > 4 * bluepix))
-            {
-                COLORS[ind] = GREEN;
-                green_detected = true;
-                ind += 1;
-            }
-            else if (!blue_detected && (bluepix > 4 * redpix) && (bluepix > 4 * greenpix))
-            {
-                COLORS[ind] = BLUE;
-                blue_detected = true;
-                ind += 1;
-            }
-        }
-    }
-    return;
-}
+//             if (!red_detected && (redpix > 4 * greenpix) && (redpix > 4 * bluepix))
+//             {
+//                 COLORS[ind] = RED;
+//                 red_detected = true;
+//                 ind += 1;
+//             }
+//             else if (!green_detected && (greenpix > 4 * redpix) && (greenpix > 4 * bluepix))
+//             {
+//                 COLORS[ind] = GREEN;
+//                 green_detected = true;
+//                 ind += 1;
+//             }
+//             else if (!blue_detected && (bluepix > 4 * redpix) && (bluepix > 4 * greenpix))
+//             {
+//                 COLORS[ind] = BLUE;
+//                 blue_detected = true;
+//                 ind += 1;
+//             }
+//         }
+//     }
+//     return;
+// }
 
 void SensorGroup::print_color_patch(int color)
 {

@@ -21,6 +21,7 @@ public:
 
     
     float get_ir_value(int index);
+    float get_ir_value_distance_sensors(int index);
     float get_distance_value(int index);
     float get_generic_value(int index);
     double get_encoder_val(int index);
@@ -30,12 +31,12 @@ public:
     
     void set_LED(int side,int colour);
     int get_colour(int cam);
-    void detect_color_patches();
+    //void detect_color_patches();
     void print_color_patch(int color);
 
     bool is_junction_detected();
     bool is_line_segment_detected();
-    void enable_wall_follow();
+    //void enable_wall_follow();
     bool is_wall(int side);
     bool is_wall_entrance();
     bool is_wall_exit();
@@ -58,7 +59,6 @@ private:
 
     PositionSensor *encoder[4];
     char encoder_name[4][18] = {"encoder_left", "encoder_right","arm_servo_encoder","box_servo_encoder"};
-    bool enableWallFollow = false;
 
     Camera *camera[3];
     char camera_name[3][14] = {"camera","camera_back","camera_front"};
@@ -111,7 +111,7 @@ private:
     int FRONT_WALL_THRESHOLD = 75;
 
     float IR_BLACK_VALUE = 10;
-    float IR_WHITE_VALUE = 4.8;
+    float IR_WHITE_VALUE = 7.4;
     float BLACK_WHITE_THRESHOLD = (IR_BLACK_VALUE + IR_WHITE_VALUE) / 2;
 
     
@@ -120,8 +120,8 @@ private:
     float OCCLUSION = 0;
     float REFLECTION_FACTOR = 0.2 + 0.8*RED_LEVEL*(1 - 0.5*ROUGHNESS)*(1 - 0.5*OCCLUSION);
 
-    int FAR_RANGE = 140;
-    int NEAR_RANGE = 70;
+    int FAR_RANGE = 145;
+    int NEAR_RANGE = 65;
     int GATE_RANGE = 300;
     
 };
