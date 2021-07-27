@@ -13,27 +13,11 @@ extern "C"
 {
 #endif
 
-    // enum State
-    // {
-    //     INITIALIZE,
-    //     LINEFOLLOW_INITIAL,
-    //     LINEFOLLOW,
-    //     LINEFOLLOW_END,
-    //     WALLFOLLOW,
-    //     SQUARE,
-    //     TURN_RIGHT,
-    //     TURN_LEFT,
-    //     CAL_FACTORS,
-    //     FIND_DESTINATION,
-    // };
-
     class LineFollower : public Robot
     {
     public:
         LineFollower();
 
-        //void update_state();
-        //void travel_maze();
         void task();
         void test();
         void circular_path_task();
@@ -48,41 +32,26 @@ extern "C"
         void delay(int time);
 
         void follow_line(float Kp, float Kd, float minSpd, float baseSpd, float maxSpd);
-        //void follow_line_until_junc_detect();
         void follow_line_until_junc_detect_fast();
         void follow_line_until_junc_detect_slow();
         void follow_line_until_segment_detect();
         void follow_line_and_count_pillars();
         void follow_line_until_wall_detect();
         void follow_line_until_box_detect();
-        //void follow_line_striaght();
-        //void follow_line_initial_phase();
-        //void follow_line_end_phase();
-        //void follow_line_middle_phase();
-        
-        
+
         void complete_turn(int dir, bool goForward = true);
         void go_forward_specific_distance(double distance);
         void go_forward_specific_distance_curve(double distance, int dir);
 
-        //void navigate_wall_maze();
         void follow_both_walls(float Kp, float Kd, float threshold);
         void follow_wall_until_line_detect();
 
         void set_servo(int state, bool wait = true);
 
-        //void find_destination();
-        //void find_factors(int n);
-
-
 
     private:
         SensorGroup *sensorGroup;
         MotorGroup *motorGroup;
-
-        //State currentState = INITIALIZE;
-        //int currentInst = 0;
-        //State order[12] = {SQUARE, SQUARE, TURN_RIGHT, TURN_LEFT, WALLFOLLOW, TURN_LEFT, TURN_RIGHT, FIND_DESTINATION};
 
         int BLACK = 0;
         int WHITE = 1;
@@ -125,28 +94,12 @@ extern "C"
         float TURN90_EN_COUNT = 5.9;
         float TURN180_EN_COUNT = 11.45;
 
-        
-
-        float WALL_FOLLOW_VERTICAL_SIDE_THRESHOLD = 63.5;
-        float WALL_FOLLOW_HORIZONTAL_SIDE_THRESHOLD = 80.0;
+    
         float WALL_FOLLOW_BASE_SPEED = 5.0;
-        float wallFollowErrorThreshold = WALL_FOLLOW_VERTICAL_SIDE_THRESHOLD;
-        int wallJuncCount = 0;
 
-        float WALL_FOLLOW_VERTICAL_FRONT_THRESHOLD = 75.0;
-        float WALL_FOLLOW_HORIZONTAL_FRONT_THRESHOLD = 60.0;
-        float frontWallThreshold = WALL_FOLLOW_VERTICAL_FRONT_THRESHOLD;
 
         float wallFollowPreviousError = 0.0;
         float lineFollowPreviousError = 0.0;
-
-        int colorPatch = -1;
-        int detectedSquares = 1;
-        int finalPosition = -1;
-        bool factorsFound = false;
-        bool colorPrinted = false;
-        int finalPhase = 50;
-        bool firstSegment = true;   //indicates weather box is in first or second line
 
         int POS_ARM_UP = 0;
         int POS_ARM_DOWN = 1;

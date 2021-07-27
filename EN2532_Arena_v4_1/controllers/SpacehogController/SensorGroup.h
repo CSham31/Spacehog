@@ -31,12 +31,10 @@ public:
     
     void set_LED(int side,int colour);
     int get_colour(int cam);
-    //void detect_color_patches();
     void print_color_patch(int color);
 
     bool is_junction_detected();
     bool is_line_segment_detected();
-    //void enable_wall_follow();
     bool is_wall(int side);
     bool is_wall_entrance();
     bool is_wall_exit();

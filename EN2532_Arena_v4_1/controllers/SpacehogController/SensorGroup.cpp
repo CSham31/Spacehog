@@ -159,11 +159,6 @@ int SensorGroup::qtr_read_line()
     return (numerator/denominator);
 }
 
-// void SensorGroup::enable_wall_follow()
-// {
-//     enableWallFollow = true;
-// }
-
 bool SensorGroup::is_wall(int side)
 {
     if ((side == RIGHT) and (get_distance_value(DS_SENSOR_RIGHT) < SIDE_WALL_THRESHOLD))
@@ -300,53 +295,6 @@ int SensorGroup::get_colour(int cam)
     cout<<"no colour"<<endl;
     return NO_COLOR;
 }
-
-// void SensorGroup::detect_color_patches()
-// {
-//     const unsigned char *IMAGE = camera[0]->getImage();
-
-
-
-//     int redpix = 0;
-//     int greenpix = 0;
-//     int bluepix = 0;
-
-//     int i, j;
-//     int ind = 0;
-//     bool red_detected = false;
-//     bool green_detected = false;
-//     bool blue_detected = false;
-
-//     for (i = 0; i < WIDTH; i++)
-//     {
-//         for (j = 0; j < HEIGHT; j++)
-//         {
-//             redpix = camera[0]->imageGetRed(IMAGE, WIDTH, i, j);
-//             bluepix = camera[0]->imageGetBlue(IMAGE, WIDTH, i, j);
-//             greenpix = camera[0]->imageGetGreen(IMAGE, WIDTH, i, j);
-
-//             if (!red_detected && (redpix > 4 * greenpix) && (redpix > 4 * bluepix))
-//             {
-//                 COLORS[ind] = RED;
-//                 red_detected = true;
-//                 ind += 1;
-//             }
-//             else if (!green_detected && (greenpix > 4 * redpix) && (greenpix > 4 * bluepix))
-//             {
-//                 COLORS[ind] = GREEN;
-//                 green_detected = true;
-//                 ind += 1;
-//             }
-//             else if (!blue_detected && (bluepix > 4 * redpix) && (bluepix > 4 * greenpix))
-//             {
-//                 COLORS[ind] = BLUE;
-//                 blue_detected = true;
-//                 ind += 1;
-//             }
-//         }
-//     }
-//     return;
-// }
 
 void SensorGroup::print_color_patch(int color)
 {
