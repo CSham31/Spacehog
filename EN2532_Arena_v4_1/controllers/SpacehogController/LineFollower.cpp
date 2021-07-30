@@ -168,7 +168,7 @@ void LineFollower::follow_line_and_count_pillars()
     {
         if(sensorGroup->is_junction_detected() == true)
         {
-            cout<<"pillar count : "<<pillarCount<<endl;
+            cout<<"PILLAR COUNT : "<<pillarCount<<endl;
             break;
         }
 
@@ -229,7 +229,7 @@ void LineFollower::complete_turn(int dir, bool goForward)
 {
     if (goForward == true)
     {
-        go_forward_specific_distance(6.0);
+        go_forward_specific_distance(5.8);
     }
 
     sensorGroup->stabilize_encoder(this);
@@ -268,7 +268,7 @@ void LineFollower::go_forward_specific_distance(double distance)
     double initialLeftENcount = sensorGroup->get_encoder_val(LEFT);
     double initialRightENcount = sensorGroup->get_encoder_val(RIGHT);
 
-    motorGroup->set_control_pid(4.5, 0, 0);
+    motorGroup->set_control_pid(8, 0, 0);
     motorGroup->set_velocity(7.5, 7.5);
 
     motorGroup->set_position(distance + initialLeftENcount, distance + initialRightENcount);
@@ -427,15 +427,15 @@ void LineFollower::determine_direction()
     else
         rampDirection = LEFT;
 
-    cout<<"front clr : ";
+    cout<<"FORNT COLOUR : ";
     sensorGroup->print_color_patch(frontFaceColour);
-    cout<<"bottom clr : ";
+    cout<<"BOTTOM COLOUR : ";
     sensorGroup->print_color_patch(bottomFaceColour);
 
     if (rampDirection == LEFT)
-        cout<<"ramp dir : LEFT"<<endl;
+        cout<<"RAMP DIRECTION : LEFT"<<endl;
     else
-        cout<<"ramp dir : RIGHT"<<endl;
+        cout<<"RAMP DIRECTION : RIGHT"<<endl;
 }
 
 void LineFollower::grab_box_detect_color()
@@ -484,26 +484,26 @@ void LineFollower::circular_path_middle_task()
 void LineFollower::circular_path_task()
 {
     complete_turn(RIGHT);
-    cout<<"QUADRANT No. 1"<<endl;
+    cout<<"QUADRANT NO. 1"<<endl;
     follow_line_until_junc_detect_slow();
     go_forward_specific_distance_curve(7.5,LEFT);
     if (box_detected == true)
     {
         circular_path_middle_task();
         complete_turn(LEFT,false);
-        cout<<"QUADRANT No. 2"<<endl;
+        cout<<"QUADRANT NO. 2"<<endl;
         follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,LEFT);        //change this to left
         complete_turn(RIGHT,false);
     }
     else                         //this case we assume that box is in the second cross line for sure
     {
-        cout<<"QUADRANT No. 4"<<endl;
+        cout<<"QUADRANT NO. 4"<<endl;
         follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,LEFT);
         circular_path_middle_task();
         complete_turn(RIGHT,false);
-        cout<<"QUADRANT No. 2"<<endl;
+        cout<<"QUADRANT NO. 2"<<endl;
         follow_line_until_junc_detect_slow();
         go_forward_specific_distance_curve(7.5,RIGHT);        //change this to left
         complete_turn(LEFT,false);
@@ -514,11 +514,11 @@ void LineFollower::circular_path_task()
 
 void LineFollower::task()
 {
-    go_forward_specific_distance(2.5);
-    follow_line_until_junc_detect_fast();
-    complete_turn(LEFT);
-    follow_line_until_wall_detect(); 
-    follow_wall_until_line_detect();        //wall following
+    // go_forward_specific_distance(2.5);
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(LEFT);
+    // follow_line_until_wall_detect(); 
+    // follow_wall_until_line_detect();        //wall following
     follow_line_until_junc_detect_fast();
     complete_turn(RIGHT);
     follow_line_until_junc_detect_fast();
@@ -550,5 +550,14 @@ void LineFollower::task()
 
 void LineFollower::test()
 {
-    cout<<sensorGroup->get_distance_value(DS_SENSOR_LEFT)<<"    "<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
+    //test - distance sensors
+    //cout<<sensorGroup->get_distance_value(DS_SENSOR_LEFT)<<"    "<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
+
+    //test - turns
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(RIGHT);
+
+    //test - gate navigate
+    follow_line_until_segment_detect();
+    navigate_gates();
 }

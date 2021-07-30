@@ -89,8 +89,8 @@ extern "C"
         float rightIRVal = 0;
         float leftIRVal = 0;
 
-        float TURN90_EN_COUNT = 5.9;
-        float TURN180_EN_COUNT = 11.45;
+        float TURN90_EN_COUNT = 5.85;
+        float TURN180_EN_COUNT = 11.4;
 
 
         float WALL_MAX_VELOCITY = 7.0;
