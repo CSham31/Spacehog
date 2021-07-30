@@ -223,6 +223,54 @@ void LineFollower::follow_line_until_box_detect()
     motorGroup->set_velocity(0, 0);
 }
 
+void LineFollower::follow_line_first_phase()
+{
+    while (step(TIME_STEP) != -1)
+    {
+        if ((sensorGroup->is_wall_entrance() == true) and (sensorGroup->is_deadend() == true))
+            break;
+
+        if(sensorGroup->is_junction_detected() == true)
+        {
+            //cout<<"junc detected"<<endl;
+            complete_turn(sensorGroup->nextTurn);
+
+        }
+            
+        follow_line(0.01,0.0,2.5,5.0,7.5);
+    }
+}
+
+void LineFollower::follow_line_second_phase()
+{
+    int count = DEACCELERATE_COUNT;
+    while (step(TIME_STEP) != -1)
+    {
+        if(sensorGroup->is_junction_detected() == true)
+        {
+            //cout<<"junc detected"<<endl;
+            step(TIME_STEP);
+            step(TIME_STEP);
+            //cout<<"after one step"<<endl;
+            if (sensorGroup->is_line_segment_detected() == true)
+            {
+                isCircleDetected = true;        //not used
+                break;
+            }
+            go_forward_specific_distance(5.45);              //go forward value is different in here as robot go two steps forward
+            complete_turn(sensorGroup->nextTurn,false);
+            count = DEACCELERATE_COUNT;
+        }
+            
+        if (count>-1)
+        {
+            baseSpeed = CONST_BASE_SPEED - count;
+            count-=0.5;
+        }
+        follow_line(0.001,0.0,7.0,baseSpeed,17.0);
+    }
+}
+
 ////////////////////////////////////////////////////////// turns /////////////////////////////////////////////////////////////
 
 void LineFollower::complete_turn(int dir, bool goForward)
@@ -514,16 +562,19 @@ void LineFollower::circular_path_task()
 
 void LineFollower::task()
 {
-    // go_forward_specific_distance(2.5);
+    // go_forward_specific_distance(3.0);
     // follow_line_until_junc_detect_fast();
-    // complete_turn(LEFT);
+    // complete_turn(sensorGroup->nextTurn);
     // follow_line_until_wall_detect(); 
     // follow_wall_until_line_detect();        //wall following
-    follow_line_until_junc_detect_fast();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect_fast();
-    complete_turn(RIGHT);
-    follow_line_until_junc_detect_fast();
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(sensorGroup->nextTurn);
+    // follow_line_until_junc_detect_fast();
+    // complete_turn(sensorGroup->nextTurn);
+    // follow_line_until_junc_detect_fast();
+
+/
+    follow_line_second_phase();
     circular_path_task();                   //entered to the circle
     follow_line_until_junc_detect_slow();
     complete_turn(rampDirection);    //on top of ramp
@@ -558,6 +609,13 @@ void LineFollower::test()
     // complete_turn(RIGHT);
 
     //test - gate navigate
-    follow_line_until_segment_detect();
-    navigate_gates();
+    // follow_line_until_segment_detect();
+    // navigate_gates();
+
+    //test - line follow
+    //follow_line(0.001,0.0,7.0,baseSpeed,17.0);
+
+    //follow_line_second_phase();
+    follow_line_first_phase();
+    cout<<"out"<<endl;
 }

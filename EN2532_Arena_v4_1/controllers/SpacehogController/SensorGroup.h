@@ -35,6 +35,7 @@ public:
 
     bool is_junction_detected();
     bool is_line_segment_detected();
+    bool is_deadend();
     bool is_wall(int side);
     bool is_wall_entrance();
     bool is_wall_exit();
@@ -46,6 +47,7 @@ public:
     int qtr_read_line();
 
     int COLORS[3];
+    int nextTurn = -1;
 
 private:
     LineFollower *follower;

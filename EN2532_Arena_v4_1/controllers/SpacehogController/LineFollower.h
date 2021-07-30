@@ -38,6 +38,8 @@ extern "C"
         void follow_line_and_count_pillars();
         void follow_line_until_wall_detect();
         void follow_line_until_box_detect();
+        void follow_line_first_phase();
+        void follow_line_second_phase();
 
         void complete_turn(int dir, bool goForward = true);
         void go_forward_specific_distance(double distance);
@@ -65,8 +67,6 @@ extern "C"
 
         float leftSpeed;
         float rightSpeed;
-
-
 
         float MAX_VELOCITY = 20.0;
         float MIN_VELOCITY = 0.0;
@@ -118,6 +118,7 @@ extern "C"
 
         int rampDirection = 0;
         int pillarCount = 0;
+        bool isCircleDetected = false;
 
 
     };

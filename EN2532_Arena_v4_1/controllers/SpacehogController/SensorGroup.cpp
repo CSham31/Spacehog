@@ -112,8 +112,30 @@ int SensorGroup::get_digital_value(int index)
 
 bool SensorGroup::is_junction_detected()
 {
-    if ((get_digital_value(LINE_DETECT_LEFT) == WHITE) or (get_digital_value(LINE_DETECT_RIGHT) == WHITE))
+    if ((get_digital_value(LINE_DETECT_LEFT) == WHITE) and (get_digital_value(QTR_0) == WHITE) and (get_digital_value(QTR_1) == WHITE) 
+    and (get_digital_value(QTR_2) == WHITE) and (get_digital_value(QTR_3) == WHITE))
+    {
+        nextTurn = LEFT;
         return true;
+    }
+    else if ((get_digital_value(LINE_DETECT_RIGHT) == WHITE) and (get_digital_value(QTR_4) == WHITE) and (get_digital_value(QTR_5) == WHITE) 
+    and (get_digital_value(QTR_6) == WHITE) and (get_digital_value(QTR_7) == WHITE))
+    {
+        nextTurn = RIGHT;
+        return true;
+    }
+    else
+        return false;
+}
+
+bool SensorGroup::is_deadend()
+{
+    if ((get_digital_value(QTR_0) == BLACK) and (get_digital_value(QTR_1) == BLACK) and (get_digital_value(QTR_2) == BLACK) 
+    and (get_digital_value(QTR_3) == BLACK)and (get_digital_value(QTR_4) == BLACK) and (get_digital_value(QTR_5) == BLACK) 
+    and (get_digital_value(QTR_6) == BLACK) and (get_digital_value(QTR_7) == BLACK))
+    {
+        return true;
+    }
     else
         return false;
 }
