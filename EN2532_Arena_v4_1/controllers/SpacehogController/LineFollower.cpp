@@ -332,14 +332,17 @@ void LineFollower::go_forward_specific_distance_curve(double distance, int dir)
     double initialLeftENcount = sensorGroup->get_encoder_val(LEFT);
     double initialRightENcount = sensorGroup->get_encoder_val(RIGHT);
 
-    motorGroup->set_control_pid(4.5, 0, 0);
-    motorGroup->set_velocity(7.5, 7.5);
+    
     if (dir == LEFT)
     {
-        motorGroup->set_position(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
-        passive_wait_curve_path(distance-2.5 + initialLeftENcount, distance + initialRightENcount);
+        motorGroup->set_control_pid(4.5, 0, 0);
+        motorGroup->set_velocity(6.0, 7.5);
+        motorGroup->set_position(distance-1.5 + initialLeftENcount, distance + initialRightENcount);
+        passive_wait_curve_path(distance-1.5 + initialLeftENcount, distance + initialRightENcount);
     }
     else{
+        motorGroup->set_control_pid(4.5, 0, 0);
+        motorGroup->set_velocity(7.5, 6.0);
         motorGroup->set_position(distance + initialLeftENcount, distance-2.5 + initialRightENcount);
         passive_wait_curve_path(distance + initialLeftENcount, distance-2.5 + initialRightENcount);
     }
@@ -534,26 +537,26 @@ void LineFollower::circular_path_task()
     complete_turn(RIGHT);
     cout<<"QUADRANT NO. 1"<<endl;
     follow_line_until_junc_detect_slow();
-    go_forward_specific_distance_curve(7.5,LEFT);
+    go_forward_specific_distance_curve(6.9,LEFT);
     if (box_detected == true)
     {
         circular_path_middle_task();
         complete_turn(LEFT,false);
         cout<<"QUADRANT NO. 2"<<endl;
         follow_line_until_junc_detect_slow();
-        go_forward_specific_distance_curve(7.5,LEFT);        //change this to left
+        go_forward_specific_distance_curve(6.15,LEFT);        //change this to left
         complete_turn(RIGHT,false);
     }
     else                         //this case we assume that box is in the second cross line for sure
     {
         cout<<"QUADRANT NO. 4"<<endl;
         follow_line_until_junc_detect_slow();
-        go_forward_specific_distance_curve(7.5,LEFT);
+        go_forward_specific_distance_curve(6.9,LEFT);
         circular_path_middle_task();
         complete_turn(RIGHT,false);
         cout<<"QUADRANT NO. 2"<<endl;
         follow_line_until_junc_detect_slow();
-        go_forward_specific_distance_curve(7.5,RIGHT);        //change this to left
+        go_forward_specific_distance_curve(6.15,RIGHT);        //change this to left
         complete_turn(LEFT,false);
     }
     cout<<"OUT OF THE CIRCLE"<<endl;
@@ -573,7 +576,9 @@ void LineFollower::task()
     // complete_turn(sensorGroup->nextTurn);
     // follow_line_until_junc_detect_fast();
 
-/
+    // go_forward_specific_distance(3.0);
+    // follow_line_first_phase();
+    // follow_wall_until_line_detect();        //wall following
     follow_line_second_phase();
     circular_path_task();                   //entered to the circle
     follow_line_until_junc_detect_slow();
