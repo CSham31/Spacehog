@@ -454,7 +454,7 @@ void LineFollower::set_servo(int state, bool wait)
     if (state <3)       //arm servo
     {
         motorGroup->set_control_pid(6, 0, 0);
-        motorGroup->set_velocity_servo(ARM, 1);
+        motorGroup->set_velocity_servo(ARM, 2);
         motorGroup->set_position_servo(ARM, servoPosition[state]);
         if (wait == true)
             passive_wait_servo(ARM, servoPosition[state]);
@@ -462,7 +462,7 @@ void LineFollower::set_servo(int state, bool wait)
     else
     {
         motorGroup->set_control_pid(6, 0, 0);
-        motorGroup->set_velocity_servo(BOX, 1);
+        motorGroup->set_velocity_servo(BOX, 1.5);
         motorGroup->set_position_servo(BOX, servoPosition[state]);
         if (wait == true)
             passive_wait_servo(BOX, servoPosition[state]);
@@ -576,9 +576,9 @@ void LineFollower::task()
     // complete_turn(sensorGroup->nextTurn);
     // follow_line_until_junc_detect_fast();
 
-    // go_forward_specific_distance(3.0);
-    // follow_line_first_phase();
-    // follow_wall_until_line_detect();        //wall following
+    go_forward_specific_distance(3.0);
+    follow_line_first_phase();
+    follow_wall_until_line_detect();        //wall following
     follow_line_second_phase();
     circular_path_task();                   //entered to the circle
     follow_line_until_junc_detect_slow();
@@ -601,6 +601,7 @@ void LineFollower::task()
     navigate_gates();
     sensorGroup->set_LED(LEFT,0);
     sensorGroup->set_LED(RIGHT,0);
+    cout<<"TASK COMPLETED"<<endl;
 
 }
 
