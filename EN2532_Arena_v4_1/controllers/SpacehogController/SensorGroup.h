@@ -105,7 +105,7 @@ private:
     int NO_COLOR = 4;
     int recentColor = -1;
 
-    int SIDE_WALL_THRESHOLD = 150;
+    int SIDE_WALL_THRESHOLD = 260;
     int FRONT_WALL_THRESHOLD = 75;
 
     float IR_BLACK_VALUE = 10;

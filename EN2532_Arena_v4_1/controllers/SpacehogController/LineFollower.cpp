@@ -131,9 +131,9 @@ void LineFollower::follow_line_until_junc_detect_fast()
         if (count>-1)
         {
             baseSpeed = CONST_BASE_SPEED - count;
-            count-=1;
+            count-=0.5;
         }
-        follow_line(0.001,0.0,7.0,12.0,17.0);
+        follow_line(0.001,0.0,7.0,baseSpeed,17.0);
     }
 
 }
@@ -313,6 +313,10 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
     {
         error = round(sensorGroup->get_distance_value(DS_SENSOR_RIGHT)) - threshold;
     }
+    else
+    {
+        error = 0;
+    }
 
     double controlValue = (error * Kp) + (error - wallFollowPreviousError) * Kd;
 
@@ -336,6 +340,7 @@ void LineFollower::follow_both_walls(float Kp, float Kd, float threshold)
     else if (leftSpeed > WALL_MAX_VELOCITY)
         leftSpeed = WALL_MAX_VELOCITY;
 
+    //cout<<leftSpeed<<"  "<<rightSpeed<<endl;
     motorGroup->set_velocity(leftSpeed, rightSpeed);
 }
 
@@ -345,7 +350,7 @@ void LineFollower::follow_wall_until_line_detect()
     {
         if (sensorGroup->is_wall_exit() == true)               //( sensorGroup->qtr_read_line() > 0 ||  sensorGroup->qtr_read_line() < 7000)
             break;
-        follow_both_walls(0.005,0.1,100);
+        follow_both_walls(0.023,0.06,100);
     }
     
 }
@@ -545,5 +550,5 @@ void LineFollower::task()
 
 void LineFollower::test()
 {
-    cout<<sensorGroup->get_distance_value(DS_SENSOR_FRONT)<<endl;
+    cout<<sensorGroup->get_distance_value(DS_SENSOR_LEFT)<<"    "<<sensorGroup->get_distance_value(DS_SENSOR_RIGHT)<<endl;
 }

@@ -67,14 +67,12 @@ extern "C"
         float rightSpeed;
 
 
-        float WALL_MAX_VELOCITY = 7.5;
-        float WALL_MIN_VELOCITY = 2.5;
 
         float MAX_VELOCITY = 20.0;
         float MIN_VELOCITY = 0.0;
-        float CONST_BASE_SPEED = 10.0;
+        float CONST_BASE_SPEED = 12.0;
         float baseSpeed = CONST_BASE_SPEED;
-        float DEACCELERATE_COUNT = 5;
+        float DEACCELERATE_COUNT = 10;
 
          
         int DS_SENSOR_BOX = 3;
@@ -94,8 +92,10 @@ extern "C"
         float TURN90_EN_COUNT = 5.9;
         float TURN180_EN_COUNT = 11.45;
 
-    
-        float WALL_FOLLOW_BASE_SPEED = 5.0;
+
+        float WALL_MAX_VELOCITY = 7.0;
+        float WALL_MIN_VELOCITY = 2.0;
+        float WALL_FOLLOW_BASE_SPEED = 4.0;
 
 
         float wallFollowPreviousError = 0.0;
